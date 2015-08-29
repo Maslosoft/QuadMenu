@@ -1,0 +1,22 @@
+{
+  "name": "quad-menu",
+  "version": "0.0.0",
+  "homepage": "http://maslosoft.com/quad-menu/",
+  "authors": [
+    "Peter Maselkowski <pmaselkowski@gmail.com>"
+  ],
+  "description": "Quad Menu",
+  "keywords": [
+    "context",
+    "menu",
+    "quad"
+  ],
+  "license": "AGPL/Commercial",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
