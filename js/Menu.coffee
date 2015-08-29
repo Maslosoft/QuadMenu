@@ -44,7 +44,12 @@ class @Maslosoft.QuadMenu.Menu
 		
 		# Push into preferred space
 		if preferred >= 0
-			@quads[preferred].push(quad)
+			@quads[preferred].push quad
 			
-		for id, quads in @quads
-			
+		# Iterate over size of existing quads
+		for size in [0 ... 4] 
+			# Push into first empty or low num quad
+			for id, quads in @quads
+				if quads.length is size
+					@quads[id].push quad
+					return
