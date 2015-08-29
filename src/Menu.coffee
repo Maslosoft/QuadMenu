@@ -20,21 +20,31 @@ class @Maslosoft.QuadMenu.Menu
 	# ]
 	# @var Maslosoft.QuadMenu.Quad[][]
 	#
-	quads: null
+	quads: [
+		[],
+		[],
+		[],
+		[],
+	]
 	
 	constructor: (@options = new Maslosoft.QuadMenu.Options) ->
+		
+		for quad in @options.quads
+			@add quad
 		
 	#
 	# Add quad to menu
 	# @param Maslosoft.QuadMenu.Quad
 	#
 	add: (quad) ->
-		preferred = quad.getPreferred()
+		preferred = intVal quad.getPreferred()
+		
+		if preferred < -1 or preferred > 3
+			throw new Error('Preferred quad must be between -1 and 3')
 		
 		# Push into preferred space
-		if preferred
-			if not @quads[preferred]
-				@quads[preferred] = []
+		if preferred >= 0
 			@quads[preferred].push(quad)
 			
-		
+		for id, quads in @quads
+			

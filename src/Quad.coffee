@@ -6,6 +6,7 @@ class @Maslosoft.QuadMenu.Quad
 	#
 	getTitle: () ->
 		
+		
 	#
 	# Get quad menu items. This should return type 
 	# of Maslosoft.QuadMenu.Item or compatible.
@@ -16,17 +17,18 @@ class @Maslosoft.QuadMenu.Quad
 	
 	#
 	# Get rpeferred quad starting conterclockwise from bottom right.
-	# Return 0 for auto.
+	# Return -1 for auto which is default.
 	# @return int preferred quad
 	#
 	getPreffered: () ->
-		
+		return -1;
 	#
 	# Whenever quad should be visible.
 	# Return true to include quad in quad menu
 	# @return bool
 	#
 	isVisible: () ->
+		return true
 	
 	#
 	# Show quad only in selected region.
@@ -34,4 +36,4 @@ class @Maslosoft.QuadMenu.Quad
 	# @return string selector
 	#
 	inRegion: () ->
-		
+		return null
