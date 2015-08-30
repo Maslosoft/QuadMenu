@@ -27,17 +27,53 @@ class @Maslosoft.QuadMenu.Menu
 		[],
 	]
 	
-	constructor: (@options = new Maslosoft.QuadMenu.Options) ->
-		
+	
+	
+	#
+	#
+	# @var DomElement
+	#
+	menu: null
+	
+	#
+	# Renderer instance
+	# @var Maslosoft.QuadMenu.Render
+	#
+	renderer: null
+	
+	constructor: (options = {}) ->
+		@options = new Maslosoft.QuadMenu.Options(options)
 		for quad in @options.quads
 			@add quad
 		
+		console.log @options.region
+		if @options.region is 'document'
+			jQuery(document).on @options.event, @onClick
+			jQuery(document).on 'contextmenu', @onContext
+		else
+			jQuery(document).on @options.event, @options.region, @onClick
+			jQuery(document).on 'contextmenu', @options.region, @onContext
+			
+		@renderer = new Maslosoft.QuadMenu.Renderer @
+		
+	
+	onClick: (e) =>
+		console.log e
+		@open e.clientX, e.clientY
+		
+	onContext: (e) =>
+		e.preventDefault()
+	
+	open: (x, y) =>
+		@renderer.open x, y
+		
+	
 	#
 	# Add quad to menu
 	# @param Maslosoft.QuadMenu.Quad
 	#
 	add: (quad) ->
-		preferred = intVal quad.getPreferred()
+		preferred = parseInt quad.getPreferred()
 		
 		if preferred < -1 or preferred > 3
 			throw new Error('Preferred quad must be between -1 and 3')

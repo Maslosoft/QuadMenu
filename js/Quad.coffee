@@ -16,11 +16,11 @@ class @Maslosoft.QuadMenu.Quad
 		
 	
 	#
-	# Get rpeferred quad starting conterclockwise from bottom right.
+	# Get preferred quad starting conterclockwise from bottom right.
 	# Return -1 for auto which is default.
 	# @return int preferred quad
 	#
-	getPreffered: () ->
+	getPreferred: () ->
 		return -1;
 	#
 	# Whenever quad should be visible.

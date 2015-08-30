@@ -5,11 +5,22 @@ if not @Maslosoft.QuadMenu
 
 class @Maslosoft.QuadMenu.Options
 	
-	region: 'body'
+	region: 'document'
+	
+	event: 'mousedown'
+	
+	#
+	# Whenever to allow default browse context menu
+	# @var bool
+	#
+	browserContext = false
 	
 	quads: []
 	
-class @Maslosoft.QuadMenu.Menu
+	constructor: (options = {}) ->
+		for name, value of options
+			@[name] = value
+class @Maslosoft.QuadMenu.Item
 	
 	#
 	# Get menu item title 
@@ -35,11 +46,11 @@ class @Maslosoft.QuadMenu.Quad
 		
 	
 	#
-	# Get rpeferred quad starting conterclockwise from bottom right.
+	# Get preferred quad starting conterclockwise from bottom right.
 	# Return -1 for auto which is default.
 	# @return int preferred quad
 	#
-	getPreffered: () ->
+	getPreferred: () ->
 		return -1;
 	#
 	# Whenever quad should be visible.
@@ -56,6 +67,33 @@ class @Maslosoft.QuadMenu.Quad
 	#
 	inRegion: () ->
 		return null
+class @Maslosoft.QuadMenu.Renderer
+	
+	#
+	# Menu instance
+	# @var @Maslosoft.QuadMenu.Menu
+	#
+	@menu: null
+	
+	@container: null
+	
+	constructor: (@menu) ->
+		
+		
+		@container = jQuery('<div class="maslosoft-quad-menu"></div>');
+		
+		for id in [0 ... 4]
+			@container.append "<div class='quad-#{id}' />"
+		
+		jQuery('body').append @container
+		
+	open: (x, y) =>
+		@container.css 'left', x
+		@container.css 'top', y
+		@container.show()
+	
+	add: (id, quad) =>
+		
 class @Maslosoft.QuadMenu.Menu
 	
 	#
@@ -85,17 +123,53 @@ class @Maslosoft.QuadMenu.Menu
 		[],
 	]
 	
-	constructor: (@options = new Maslosoft.QuadMenu.Options) ->
-		
+	
+	
+	#
+	#
+	# @var DomElement
+	#
+	menu: null
+	
+	#
+	# Renderer instance
+	# @var Maslosoft.QuadMenu.Render
+	#
+	renderer: null
+	
+	constructor: (options = {}) ->
+		@options = new Maslosoft.QuadMenu.Options(options)
 		for quad in @options.quads
 			@add quad
 		
+		console.log @options.region
+		if @options.region is 'document'
+			jQuery(document).on @options.event, @onClick
+			jQuery(document).on 'contextmenu', @onContext
+		else
+			jQuery(document).on @options.event, @options.region, @onClick
+			jQuery(document).on 'contextmenu', @options.region, @onContext
+			
+		@renderer = new Maslosoft.QuadMenu.Renderer @
+		
+	
+	onClick: (e) =>
+		console.log e
+		@open e.clientX, e.clientY
+		
+	onContext: (e) =>
+		e.preventDefault()
+	
+	open: (x, y) =>
+		@renderer.open x, y
+		
+	
 	#
 	# Add quad to menu
 	# @param Maslosoft.QuadMenu.Quad
 	#
 	add: (quad) ->
-		preferred = intVal quad.getPreferred()
+		preferred = parseInt quad.getPreferred()
 		
 		if preferred < -1 or preferred > 3
 			throw new Error('Preferred quad must be between -1 and 3')

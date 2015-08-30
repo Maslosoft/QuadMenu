@@ -1,0 +1,36 @@
+.maslosoft-quad-menu {
+  position: absolute;
+  width: 100px;
+  height: 1px;
+  background: red;
+}
+.maslosoft-quad-menu .quad-0,
+.maslosoft-quad-menu .quad-1,
+.maslosoft-quad-menu .quad-2,
+.maslosoft-quad-menu .quad-3 {
+  width: 100px;
+  height: 20px;
+  background: blue;
+  position: absolute;
+}
+.maslosoft-quad-menu .quad-0 {
+  background: maroon;
+  top: 0;
+  left: 0;
+}
+.maslosoft-quad-menu .quad-1 {
+  background: olive;
+  bottom: 0;
+  left: 0;
+}
+.maslosoft-quad-menu .quad-2 {
+  background: green;
+  bottom: 0;
+  right: 100%;
+}
+.maslosoft-quad-menu .quad-3 {
+  bacground: orange;
+  top: 0;
+  right: 100%;
+}
+/*# sourceMappingURL=dist/quad-menu.css.map */

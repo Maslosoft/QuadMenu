@@ -3,6 +3,7 @@ coffees = [
 	'js/Options.coffee',
 	'js/Item.coffee',
 	'js/Quad.coffee',
+	'js/Renderer.coffee'
 	'js/Menu.coffee'
 ]
 less = [

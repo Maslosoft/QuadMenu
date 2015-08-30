@@ -1,4 +1,4 @@
-class @Maslosoft.QuadMenu.Menu
+class @Maslosoft.QuadMenu.Item
 	
 	#
 	# Get menu item title 
