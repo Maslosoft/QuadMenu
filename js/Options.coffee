@@ -12,6 +12,10 @@ class @Maslosoft.QuadMenu.Options
 	
 	quads: []
 	
+	#
+	# Options constructor. Will merge provided params with defaults.
+	# @param object options
+	#
 	constructor: (options = {}) ->
 		for name, value of options
 			@[name] = value

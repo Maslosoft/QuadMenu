@@ -1,27 +1,71 @@
+#
+# Renderer of Quad menu. This generates
+# HTML markup containing for quads
+#
+#
+#
+#
 class @Maslosoft.QuadMenu.Renderer
 	
 	#
 	# Menu instance
-	# @var @Maslosoft.QuadMenu.Menu
+	# @var Maslosoft.QuadMenu.Menu
 	#
-	@menu: null
+	menu: null
 	
-	@container: null
+	#
+	# Quad menu container
+	# @var jQuery
+	#
+	container: null
 	
+	#
+	# Quads html elements
+	# @var jQuery
+	#
+	quads: []
+	
+	#
+	# Class constructor
+	# @param Maslosoft.QuadMenu.Menu
+	#
 	constructor: (@menu) ->
 		
 		
-		@container = jQuery('<div class="maslosoft-quad-menu"></div>');
+		@container = jQuery '<div class="maslosoft-quad-menu"></div>'
 		
 		for id in [0 ... 4]
-			@container.append "<div class='quad-#{id}' />"
+			quad = jQuery "<ul class='quad-#{id}' />"
+			@quads.push quad
+			@container.append quad
 		
 		jQuery('body').append @container
 		
+	#
+	# show quad menu at specified location
+	# @var int X coordinate
+	# @var int Y coordinate
+	#
 	open: (x, y) =>
 		@container.css 'left', x
 		@container.css 'top', y
 		@container.show()
+		
+	#
+	# Close context menu
+	#
+	#
+	close: () =>
+		@container.hide()
 	
+	#
+	# Add quad html markup
+	# @param int Id
+	# @param Maslosoft.QuadMenu.Quad 
+	#
 	add: (id, quad) =>
+		if quad.getTitle()
+			@quads[id].append "<li class='quad-title'>#{quad.getTitle()}</li>"
+		console.log @quads
+		
 		

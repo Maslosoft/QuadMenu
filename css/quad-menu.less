@@ -1,16 +1,39 @@
+@quadTitleBg: #333;
+@quadTitleColor: #fff;
 .maslosoft-quad-menu{
 	position: absolute;
-	width:100px;
-	height: 1px;
+	// min-width:100px;
+	// min-height: 1px;
 	background:red;
+	display:none;
+	white-space: nowrap;
 	
+	ul, li{
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+	
+	.quad-title{
+		color:@quadTitleColor;
+		background: @quadTitleBg;
+		padding:2px 5px;
+	}
+	
+	// All quads
 	.quad-0, .quad-1, .quad-2, .quad-3{
-		width: 100px;
-		height: 20px;
+		// min-width: 100px;
+		// min-height: 20px;
 		background: blue;
 		position: absolute;
 	}
 	
+	// Right quads
+	.quad-0, .quad-1{
+		.quad-title{
+			text-align: right;
+		}
+	}
 	.quad-0{
 		background: maroon;
 		top: 0;
@@ -20,6 +43,14 @@
 		background: olive;
 		bottom: 0;
 		left: 0;
+		
+	}
+	
+	// Left quads
+	.quad-2, .quad-3{
+		.quad-title{
+			text-align: left;
+		}
 	}
 	.quad-2{
 		background: green;

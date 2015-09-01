@@ -47,7 +47,17 @@
   this.Maslosoft.QuadMenu.Quad = (function() {
     function Quad() {}
 
-    Quad.prototype.getTitle = function() {};
+    Quad.prototype.title = '';
+
+    Quad.prototype.items = [];
+
+    Quad.prototype.setTitle = function(title) {
+      this.title = title;
+    };
+
+    Quad.prototype.getTitle = function() {
+      return this.title;
+    };
 
     Quad.prototype.getItems = function() {};
 
@@ -68,18 +78,23 @@
   })();
 
   this.Maslosoft.QuadMenu.Renderer = (function() {
-    Renderer.menu = null;
+    Renderer.prototype.menu = null;
 
-    Renderer.container = null;
+    Renderer.prototype.container = null;
+
+    Renderer.prototype.quads = [];
 
     function Renderer(menu) {
-      var i, id;
+      var i, id, quad;
       this.menu = menu;
       this.add = bind(this.add, this);
+      this.close = bind(this.close, this);
       this.open = bind(this.open, this);
       this.container = jQuery('<div class="maslosoft-quad-menu"></div>');
       for (id = i = 0; i < 4; id = ++i) {
-        this.container.append("<div class='quad-" + id + "' />");
+        quad = jQuery("<ul class='quad-" + id + "' />");
+        this.quads.push(quad);
+        this.container.append(quad);
       }
       jQuery('body').append(this.container);
     }
@@ -90,7 +105,16 @@
       return this.container.show();
     };
 
-    Renderer.prototype.add = function(id, quad) {};
+    Renderer.prototype.close = function() {
+      return this.container.hide();
+    };
+
+    Renderer.prototype.add = function(id, quad) {
+      if (quad.getTitle()) {
+        this.quads[id].append("<li class='quad-title'>" + (quad.getTitle()) + "</li>");
+      }
+      return console.log(this.quads);
+    };
 
     return Renderer;
 
@@ -110,10 +134,14 @@
       if (options == null) {
         options = {};
       }
+      this.close = bind(this.close, this);
       this.open = bind(this.open, this);
-      this.onContext = bind(this.onContext, this);
+      this.stop = bind(this.stop, this);
+      this.preventContext = bind(this.preventContext, this);
       this.onClick = bind(this.onClick, this);
       this.options = new Maslosoft.QuadMenu.Options(options);
+      this.renderer = new Maslosoft.QuadMenu.Renderer(this);
+      console.log(this.options);
       ref = this.options.quads;
       for (i = 0, len = ref.length; i < len; i++) {
         quad = ref[i];
@@ -122,25 +150,49 @@
       console.log(this.options.region);
       if (this.options.region === 'document') {
         jQuery(document).on(this.options.event, this.onClick);
-        jQuery(document).on('contextmenu', this.onContext);
+        jQuery(document).on('contextmenu', this.preventContext);
       } else {
         jQuery(document).on(this.options.event, this.options.region, this.onClick);
-        jQuery(document).on('contextmenu', this.options.region, this.onContext);
+        jQuery(document).on('contextmenu', this.options.region, this.preventContext);
       }
-      this.renderer = new Maslosoft.QuadMenu.Renderer(this);
+      this.renderer.container.on(this.options.event, this.stop);
+      jQuery(document).on('keydown', (function(_this) {
+        return function(e) {
+          if (e.keyCode === 27) {
+            return _this.close();
+          }
+        };
+      })(this));
     }
 
     Menu.prototype.onClick = function(e) {
-      console.log(e);
-      return this.open(e.clientX, e.clientY);
+      if (e.which === 3) {
+        this.open(e.clientX, e.clientY);
+        if (!this.options.browserContext) {
+          return e.preventDefault();
+        }
+      } else {
+        return this.close();
+      }
     };
 
-    Menu.prototype.onContext = function(e) {
-      return e.preventDefault();
+    Menu.prototype.preventContext = function(e) {
+      e.preventDefault();
+      if (!this.options.browserContext) {
+        return e.preventDefault();
+      }
+    };
+
+    Menu.prototype.stop = function(e) {
+      return e.stopPropagation();
     };
 
     Menu.prototype.open = function(x, y) {
       return this.renderer.open(x, y);
+    };
+
+    Menu.prototype.close = function() {
+      return this.renderer.close();
     };
 
     Menu.prototype.add = function(quad) {
@@ -154,10 +206,12 @@
       }
       for (size = i = 0; i < 4; size = ++i) {
         ref = this.quads;
-        for (quads = j = 0, len = ref.length; j < len; quads = ++j) {
-          id = ref[quads];
+        for (id = j = 0, len = ref.length; j < len; id = ++j) {
+          quads = ref[id];
+          console.log(quad);
           if (quads.length === size) {
-            this.quads[id].push(quad);
+            quads.push(quad);
+            this.renderer.add(id, quad);
             return;
           }
         }

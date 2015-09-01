@@ -1,17 +1,30 @@
 .maslosoft-quad-menu {
   position: absolute;
-  width: 100px;
-  height: 1px;
   background: red;
+  display: none;
+  white-space: nowrap;
+}
+.maslosoft-quad-menu ul,
+.maslosoft-quad-menu li {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.maslosoft-quad-menu .quad-title {
+  color: #ffffff;
+  background: #333333;
+  padding: 2px 5px;
 }
 .maslosoft-quad-menu .quad-0,
 .maslosoft-quad-menu .quad-1,
 .maslosoft-quad-menu .quad-2,
 .maslosoft-quad-menu .quad-3 {
-  width: 100px;
-  height: 20px;
   background: blue;
   position: absolute;
+}
+.maslosoft-quad-menu .quad-0 .quad-title,
+.maslosoft-quad-menu .quad-1 .quad-title {
+  text-align: right;
 }
 .maslosoft-quad-menu .quad-0 {
   background: maroon;
@@ -23,13 +36,17 @@
   bottom: 0;
   left: 0;
 }
+.maslosoft-quad-menu .quad-2 .quad-title,
+.maslosoft-quad-menu .quad-3 .quad-title {
+  text-align: left;
+}
 .maslosoft-quad-menu .quad-2 {
   background: green;
   bottom: 0;
   right: 100%;
 }
 .maslosoft-quad-menu .quad-3 {
-  bacground: orange;
+  background: orange;
   top: 0;
   right: 100%;
 }

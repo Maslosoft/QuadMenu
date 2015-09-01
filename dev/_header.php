@@ -23,7 +23,7 @@
 				padding: 2px;
 			}
 			nav ul{
-				background: url('./images/menuBg.jpg') no-repeat;
+				/*background: url('./images/menuBg.jpg') no-repeat;*/
 				background-size: cover;
 			}
 			nav ul li{

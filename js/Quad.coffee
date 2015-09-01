@@ -1,11 +1,25 @@
 class @Maslosoft.QuadMenu.Quad
 
 	#
+	# Title of quad. If not set, it will 
+	# @var string
+	#
+	title: ''
+
+	#
+	# Quad items
+	# @var Maslosoft.QuadMenu.Item[]
+	#
+	items: []
+
+	setTitle: (@title) ->
+		
+	#
 	# Get quad title. This will appear on top of menu.
 	# @return string quad title
 	#
 	getTitle: () ->
-		
+		return @title
 		
 	#
 	# Get quad menu items. This should return type 
@@ -21,7 +35,7 @@ class @Maslosoft.QuadMenu.Quad
 	# @return int preferred quad
 	#
 	getPreferred: () ->
-		return -1;
+		return -1
 	#
 	# Whenever quad should be visible.
 	# Return true to include quad in quad menu
