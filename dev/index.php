@@ -1,6 +1,12 @@
 <?php
 require '_header.php'
 ?>
+<h1>
+	Quad Menu Demo
+</h1>
+<p>
+	<b>Right click somewhere</b>
+</p>
 <label>
 	<input type="checkbox" id="close" />
 	Close menu when I click item
