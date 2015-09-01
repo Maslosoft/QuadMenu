@@ -63,9 +63,27 @@ class @Maslosoft.QuadMenu.Renderer
 	# @param int Id
 	# @param Maslosoft.QuadMenu.Quad 
 	#
-	add: (id, quad) =>
+	add: (id, menuId, quad) =>
 		if quad.getTitle()
 			@quads[id].append "<li class='quad-title'>#{quad.getTitle()}</li>"
-		console.log @quads
-		
+		for itemId, item of quad.items
+			item.setMenu @menu
+			
+			itemElement = """
+			<li>
+				<a href="#{item.getHref()}" 
+					data-item-id="#{itemId}"
+					data-menu-id="#{menuId}"
+					data-quad-id="#{id}"	
+					>
+					#{item.getTitle()}
+				</a>
+			</li>
+			"""
+			if id in [1, 2]
+				# Top quads - need prepend
+				@quads[id].prepend itemElement
+			else
+				# Bottom quads - need append
+				@quads[id].append itemElement
 		

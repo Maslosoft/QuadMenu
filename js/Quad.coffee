@@ -12,6 +12,14 @@ class @Maslosoft.QuadMenu.Quad
 	#
 	items: []
 
+	constructor: (options = {}) ->
+		for name, value of options
+			@[name] = value
+	
+	#
+	# Set title
+	# @param string title
+	#
 	setTitle: (@title) ->
 		
 	#

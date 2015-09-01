@@ -1,5 +1,12 @@
 @quadTitleBg: #333;
 @quadTitleColor: #fff;
+
+@itemBg: lighten(@quadTitleBg, 25%);
+@itemColor: #fff;
+@itemHoverBg: #0e91d3;
+@itemHoverColor: @itemColor;
+@padding: 2px 5px;
+
 .maslosoft-quad-menu{
 	position: absolute;
 	// min-width:100px;
@@ -14,10 +21,25 @@
 		list-style: none;
 	}
 	
+	li{
+		background: @itemBg;
+		color: @itemColor;
+		a{
+			display: block;
+			text-decoration: none;
+			color: @itemColor;
+			padding: @padding;
+			&:hover{
+				background: @itemHoverBg;
+				color:@itemHoverColor;
+			}
+		}
+	}
+	
 	.quad-title{
-		color:@quadTitleColor;
+		color: @quadTitleColor;
 		background: @quadTitleBg;
-		padding:2px 5px;
+		padding: @padding;
 	}
 	
 	// All quads
@@ -32,6 +54,9 @@
 	.quad-0, .quad-1{
 		.quad-title{
 			text-align: right;
+			&:first-child{
+				// margin-left:1em;
+			}
 		}
 	}
 	.quad-0{
@@ -48,6 +73,7 @@
 	
 	// Left quads
 	.quad-2, .quad-3{
+		text-align: right;
 		.quad-title{
 			text-align: left;
 		}

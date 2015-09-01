@@ -70,8 +70,15 @@ class @Maslosoft.QuadMenu.Menu
 			jQuery(document).on @options.event, @options.region, @onClick
 			jQuery(document).on 'contextmenu', @options.region, @preventContext
 		
-		# Stop propagation when clicked on menu itself
+		# Stop propagation when has event (click or mousedown) 
+		# on menu itself
 		@renderer.container.on @options.event, @stop
+		
+		# Prevent click events default action on menu.
+		# This is to operate on mousedown, known as RapidClick™.
+		# No seriously, it looks like menu is very fast.
+		@renderer.container.on 'click', @prevent
+			
 		
 		# Close on Esc
 		jQuery(document).on 'keydown', (e) =>
@@ -82,9 +89,10 @@ class @Maslosoft.QuadMenu.Menu
 		# Close if clicked elsewere
 		
 		
-	
+	#
+	# TODO Rename to regionClick
 	onClick: (e) =>
-		
+		console.log e
 		if e.which is 3
 			# Show on right button click
 			@open e.clientX, e.clientY
@@ -98,9 +106,25 @@ class @Maslosoft.QuadMenu.Menu
 		e.preventDefault()
 		if not @options.browserContext
 			e.preventDefault()
-			
+
+	#
+	# TODO Rename to menu click or item click			
 	stop: (e) =>
+		data = jQuery(e.target).data()
+		quadItems = @quads[data.quadId]
+		if quadItems
+			# @var quad Maslosoft.QuadMenu.Quad
+			quad = quadItems[data.menuId]
+		if quad
+			# @var quad Maslosoft.QuadMenu.Item
+			item = quad.items[data.itemId]
+		if item
+			console.log item.onClick(e, item)
+		
 		e.stopPropagation()
+		
+	prevent: (e) ->
+		e.preventDefault()
 	
 	open: (x, y) =>
 		@renderer.open x, y
@@ -128,6 +152,6 @@ class @Maslosoft.QuadMenu.Menu
 			for quads, id in @quads
 				console.log quad
 				if quads.length is size
-					quads.push quad
-					@renderer.add id, quad
+					menuId = quads.push quad
+					@renderer.add id, menuId - 1, quad
 					return

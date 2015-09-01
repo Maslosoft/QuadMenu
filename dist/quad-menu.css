@@ -10,6 +10,20 @@
   padding: 0;
   list-style: none;
 }
+.maslosoft-quad-menu li {
+  background: #737373;
+  color: #ffffff;
+}
+.maslosoft-quad-menu li a {
+  display: block;
+  text-decoration: none;
+  color: #ffffff;
+  padding: 2px 5px;
+}
+.maslosoft-quad-menu li a:hover {
+  background: #0e91d3;
+  color: #ffffff;
+}
 .maslosoft-quad-menu .quad-title {
   color: #ffffff;
   background: #333333;
@@ -35,6 +49,10 @@
   background: olive;
   bottom: 0;
   left: 0;
+}
+.maslosoft-quad-menu .quad-2,
+.maslosoft-quad-menu .quad-3 {
+  text-align: right;
 }
 .maslosoft-quad-menu .quad-2 .quad-title,
 .maslosoft-quad-menu .quad-3 .quad-title {
