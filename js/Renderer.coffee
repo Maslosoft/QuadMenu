@@ -32,7 +32,7 @@ class @Maslosoft.QuadMenu.Renderer
 	constructor: (@menu) ->
 		
 		
-		@container = jQuery '<div class="maslosoft-quad-menu"></div>'
+		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
 		
 		for id in [0 ... 4]
 			quad = jQuery "<ul class='quad-#{id}' />"

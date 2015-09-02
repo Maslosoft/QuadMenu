@@ -132,7 +132,7 @@
       this.add = bind(this.add, this);
       this.close = bind(this.close, this);
       this.open = bind(this.open, this);
-      this.container = jQuery('<div class="maslosoft-quad-menu"></div>');
+      this.container = jQuery("<div class=\"maslosoft-quad-menu\"></div>");
       for (id = i = 0; i < 4; id = ++i) {
         quad = jQuery("<ul class='quad-" + id + "' />");
         this.quads.push(quad);

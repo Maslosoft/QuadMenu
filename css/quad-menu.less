@@ -1,11 +1,17 @@
-@quadTitleBg: #333;
+@quadTitleBg: #222;
 @quadTitleColor: #fff;
 
-@itemBg: lighten(@quadTitleBg, 25%);
+@fontSize: 14px;
+@lineHeight: 20px;
+
+@itemBg: lighten(@quadTitleBg, 10%);
 @itemColor: #fff;
 @itemHoverBg: #0e91d3;
 @itemHoverColor: @itemColor;
-@padding: 2px 5px;
+@borderWidth: 1px;
+@padH: 2px;
+@padV: 5px;
+@padding: @padH @padV;
 
 .maslosoft-quad-menu{
 	position: absolute;
@@ -48,27 +54,33 @@
 		// min-height: 20px;
 		background: blue;
 		position: absolute;
+		border-color: @itemHoverBg;
+		border-style: solid;
+		border-width: 0px;
 	}
 	
 	// Right quads
 	.quad-0, .quad-1{
 		.quad-title{
 			text-align: right;
-			&:first-child{
-				// margin-left:1em;
-			}
 		}
+		border-left-width: @borderWidth;
 	}
+	
+	// Right bottom
 	.quad-0{
 		background: maroon;
 		top: 0;
 		left: 0;
+		border-top-width: @borderWidth;
 	}
+	
+	// Right top
 	.quad-1{
 		background: olive;
 		bottom: 0;
 		left: 0;
-		
+		border-bottom-width: @borderWidth;
 	}
 	
 	// Left quads
@@ -77,15 +89,22 @@
 		.quad-title{
 			text-align: left;
 		}
+		border-right-width: @borderWidth;
 	}
+	
+	// Left top
 	.quad-2{
 		background: green;
 		bottom: 0;
 		right: 100%;
+		border-bottom-width: @borderWidth;
 	}
+	
+	// Left bottom
 	.quad-3{
 		background: orange;
 		top: 0;
 		right: 100%;
+		border-top-width: @borderWidth;
 	}
 }
