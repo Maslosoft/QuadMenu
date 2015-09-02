@@ -40,7 +40,7 @@ class @Maslosoft.QuadMenu.Renderer
 		
 		# Create empty quads
 		for id in [0 ... 4]
-			quad = jQuery "<ul class='quad-#{id}' />"
+			quad = jQuery "<div class='quad-#{id}' />"
 			@quads.push quad
 			@container.append quad
 		
@@ -57,6 +57,31 @@ class @Maslosoft.QuadMenu.Renderer
 		@container.css 'top', y
 		@container.show()
 		
+		# Show or hide quads
+		for quad, id in @menu.quads
+			quadElement = @container.find ".quad-#{id}"
+			# show = quad.isVisible()
+			show = true
+			isVisible = quadElement.is ":visible"
+			if show and not isVisible
+				quadElement.show()
+			if not show and isVisible
+				quadElement.hide()
+				
+				
+		# Show or hide items
+		@container.find('a').each (index, element) =>
+			element = jQuery(element)
+			item = @menu.getItem element.data()
+			isVisible = element.is ":visible"
+			show = item.isVisible()
+			if show and not isVisible
+				element.show()
+			if not show and isVisible
+				element.hide()
+			
+			console.log item
+		
 	#
 	# Close context menu
 	#
@@ -71,16 +96,22 @@ class @Maslosoft.QuadMenu.Renderer
 	#
 	add: (id, menuId, quad) =>
 		if quad.getTitle()
-			@quads[id].append "<li class='quad-title'>#{quad.getTitle()}</li>"
+			@quads[id].append """
+			<li class="quad-title"
+				data-menu-id="#{menuId}"
+				data-quad-id="#{id}"
+				>
+				#{quad.getTitle()}
+			</li>"""
 		for itemId, item of quad.items
 			item.setMenu @menu
 			
 			itemElement = """
 			<li>
-				<a href="#{item.getHref()}" 
+				<a href="#{item.getHref()}"
 					data-item-id="#{itemId}"
 					data-menu-id="#{menuId}"
-					data-quad-id="#{id}"	
+					data-quad-id="#{id}"
 					>
 					#{item.getTitle()}
 				</a>

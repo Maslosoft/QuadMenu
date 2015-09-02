@@ -11,6 +11,24 @@ require '_header.php'
 	<input type="checkbox" id="close" />
 	Close menu when I click item
 </label>
+<div id="quadsHide">
+	<?php foreach([0,1,2, 3] as $id):?>
+	<label data-quad-id="<?= $id; ?>">
+		<input type="checkbox" />
+		Hide quad <?= $id; ?>
+	</label>
+	<?php endforeach;?>
+</div>
+<div id="itemsHide">
+	<?php foreach([0,1,2] as $id):?>
+	<label data-item-id="<?= $id; ?>"
+			data-menu-id="0"
+			data-quad-id="0">
+		<input type="checkbox" />
+		Hide item 0, 0, <?= $id; ?>
+	</label>
+	<?php endforeach;?>
+</div>
 <script>
 	jQuery(document).ready(function(){
 		var click = function(e, item){
@@ -85,7 +103,34 @@ require '_header.php'
 		quad.setTitle('Fifth quad ever');
 		menu.add(quad);
 		
-		
+		// Additional stuff
+		// Show/hide items
+		jQuery('#itemsHide').on('click', 'label', function(e){
+			e.stopPropagation();
+			var el = jQuery(e.target);
+			var box = el.find('checkbox');
+			var data = el.data();
+			if(data.itemId !== null){
+				item = menu.getItem(data);
+				if(item){
+					item.isVisible(box.is(':checked'));
+				}
+			}
+		});
+		// Show hide quads
+		jQuery('#quadsHide').on('click', 'label', function(e){
+			e.stopPropagation();
+			var el = jQuery(e.target);
+			var box = el.find('checkbox');
+			var data = el.data();
+			if(data.quadId !== null){
+				item = menu.getQuad(data);
+				console.log(item);
+				if(item){
+					item.isVisible(box.is(':checked'));
+				}
+			}
+		});
 	});
 </script>
 <div id="log">

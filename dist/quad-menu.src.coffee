@@ -51,7 +51,32 @@ class @Maslosoft.QuadMenu.Options
 	constructor: (options = {}) ->
 		for name, value of options
 			@[name] = value
-class @Maslosoft.QuadMenu.Item
+#
+# Shared items, menus and quads properties 
+#
+#
+class @Maslosoft.QuadMenu.ItemBase
+	
+	visible: true
+	
+	#
+	# Whenever quad should be visible.
+	# Return true to include quad in quad menu
+	# @return bool
+	#
+	isVisible: (visible = null) ->
+		if visible isnt null
+			@visible = visible
+		return @visible;
+	
+	#
+	# Show quad only in selected region.
+	# Return null or empty string to show in each region.
+	# @return string selector
+	#
+	inRegion: () ->
+		return null
+class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 
 	#
 	# Title of menu item 
@@ -91,7 +116,7 @@ class @Maslosoft.QuadMenu.Item
 
 	getHref: () ->
 		return '#'
-class @Maslosoft.QuadMenu.Quad
+class @Maslosoft.QuadMenu.Quad  extends @Maslosoft.QuadMenu.ItemBase
 
 	#
 	# Title of quad. If not set, it will 
@@ -137,21 +162,7 @@ class @Maslosoft.QuadMenu.Quad
 	#
 	getPreferred: () ->
 		return -1
-	#
-	# Whenever quad should be visible.
-	# Return true to include quad in quad menu
-	# @return bool
-	#
-	isVisible: () ->
-		return true
-	
-	#
-	# Show quad only in selected region.
-	# Return null or empty string to show in each region.
-	# @return string selector
-	#
-	inRegion: () ->
-		return null
+
 #
 # Renderer of Quad menu. This generates
 # HTML markup containing for quads
@@ -194,7 +205,7 @@ class @Maslosoft.QuadMenu.Renderer
 		
 		# Create empty quads
 		for id in [0 ... 4]
-			quad = jQuery "<ul class='quad-#{id}' />"
+			quad = jQuery "<div class='quad-#{id}' />"
 			@quads.push quad
 			@container.append quad
 		
@@ -211,6 +222,31 @@ class @Maslosoft.QuadMenu.Renderer
 		@container.css 'top', y
 		@container.show()
 		
+		# Show or hide quads
+		for quad, id in @menu.quads
+			quadElement = @container.find ".quad-#{id}"
+			# show = quad.isVisible()
+			show = true
+			isVisible = quadElement.is ":visible"
+			if show and not isVisible
+				quadElement.show()
+			if not show and isVisible
+				quadElement.hide()
+				
+				
+		# Show or hide items
+		@container.find('a').each (index, element) =>
+			element = jQuery(element)
+			item = @menu.getItem element.data()
+			isVisible = element.is ":visible"
+			show = item.isVisible()
+			if show and not isVisible
+				element.show()
+			if not show and isVisible
+				element.hide()
+			
+			console.log item
+		
 	#
 	# Close context menu
 	#
@@ -225,16 +261,22 @@ class @Maslosoft.QuadMenu.Renderer
 	#
 	add: (id, menuId, quad) =>
 		if quad.getTitle()
-			@quads[id].append "<li class='quad-title'>#{quad.getTitle()}</li>"
+			@quads[id].append """
+			<li class="quad-title"
+				data-menu-id="#{menuId}"
+				data-quad-id="#{id}"
+				>
+				#{quad.getTitle()}
+			</li>"""
 		for itemId, item of quad.items
 			item.setMenu @menu
 			
 			itemElement = """
 			<li>
-				<a href="#{item.getHref()}" 
+				<a href="#{item.getHref()}"
 					data-item-id="#{itemId}"
 					data-menu-id="#{menuId}"
-					data-quad-id="#{id}"	
+					data-quad-id="#{id}"
 					>
 					#{item.getTitle()}
 				</a>
@@ -247,7 +289,7 @@ class @Maslosoft.QuadMenu.Renderer
 				# Bottom quads - need append
 				@quads[id].append itemElement
 		
-class @Maslosoft.QuadMenu.Menu
+class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 	
 	#
 	# Options
@@ -335,7 +377,6 @@ class @Maslosoft.QuadMenu.Menu
 	# @param e Event
 	#
 	regionClick: (e) =>
-		console.log e
 		if e.which is 3
 			# Show on right button click
 			@open e.clientX, e.clientY
@@ -350,15 +391,9 @@ class @Maslosoft.QuadMenu.Menu
 	#	
 	itemClick: (e) =>
 		data = jQuery(e.target).data()
-		quadItems = @quads[data.quadId]
-		if quadItems
-			# @var quad Maslosoft.QuadMenu.Quad
-			quad = quadItems[data.menuId]
-		if quad
-			# @var quad Maslosoft.QuadMenu.Item
-			item = quad.items[data.itemId]
+		item = @getItem(data)
 		if item
-			console.log item.onClick(e, item)
+			item.onClick(e, item)
 		
 		e.stopPropagation()
 		
@@ -370,6 +405,23 @@ class @Maslosoft.QuadMenu.Menu
 		
 	prevent: (e) ->
 		e.preventDefault()
+	
+	getItem: (data) ->
+		item = null
+		quadItems = @quads[data.quadId]
+		if quadItems
+			# @var quad Maslosoft.QuadMenu.Quad
+			quad = quadItems[data.menuId]
+		if quad
+			# @var quad Maslosoft.QuadMenu.Item
+			item = quad.items[data.itemId]
+		return item
+	
+	getMenu: (data) ->
+		
+	
+	getQuad: (data) ->
+		return @quads[data.quadId]
 	
 	open: (x, y) =>
 		@renderer.open x, y

@@ -1,4 +1,4 @@
-class @Maslosoft.QuadMenu.Item
+class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 
 	#
 	# Title of menu item 

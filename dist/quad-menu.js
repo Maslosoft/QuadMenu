@@ -1,5 +1,7 @@
 (function() {
-  var bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
+  var extend = function(child, parent) { for (var key in parent) { if (hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
+    hasProp = {}.hasOwnProperty,
+    bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   if (!this.Maslosoft) {
     this.Maslosoft = {};
@@ -37,7 +39,32 @@
 
   })();
 
-  this.Maslosoft.QuadMenu.Item = (function() {
+  this.Maslosoft.QuadMenu.ItemBase = (function() {
+    function ItemBase() {}
+
+    ItemBase.prototype.visible = true;
+
+    ItemBase.prototype.isVisible = function(visible) {
+      if (visible == null) {
+        visible = null;
+      }
+      if (visible !== null) {
+        this.visible = visible;
+      }
+      return this.visible;
+    };
+
+    ItemBase.prototype.inRegion = function() {
+      return null;
+    };
+
+    return ItemBase;
+
+  })();
+
+  this.Maslosoft.QuadMenu.Item = (function(superClass) {
+    extend(Item, superClass);
+
     Item.prototype.title = '';
 
     Item.prototype.href = '';
@@ -77,9 +104,11 @@
 
     return Item;
 
-  })();
+  })(this.Maslosoft.QuadMenu.ItemBase);
 
-  this.Maslosoft.QuadMenu.Quad = (function() {
+  this.Maslosoft.QuadMenu.Quad = (function(superClass) {
+    extend(Quad, superClass);
+
     Quad.prototype.title = '';
 
     Quad.prototype.items = [];
@@ -109,17 +138,9 @@
       return -1;
     };
 
-    Quad.prototype.isVisible = function() {
-      return true;
-    };
-
-    Quad.prototype.inRegion = function() {
-      return null;
-    };
-
     return Quad;
 
-  })();
+  })(this.Maslosoft.QuadMenu.ItemBase);
 
   this.Maslosoft.QuadMenu.Renderer = (function() {
     Renderer.prototype.menu = null;
@@ -139,7 +160,7 @@
         this.container.append("<div class=\"quad-spot\" /> ");
       }
       for (id = i = 0; i < 4; id = ++i) {
-        quad = jQuery("<ul class='quad-" + id + "' />");
+        quad = jQuery("<div class='quad-" + id + "' />");
         this.quads.push(quad);
         this.container.append(quad);
       }
@@ -147,9 +168,39 @@
     }
 
     Renderer.prototype.open = function(x, y) {
+      var i, id, isVisible, len, quad, quadElement, ref, show;
       this.container.css('left', x);
       this.container.css('top', y);
-      return this.container.show();
+      this.container.show();
+      ref = this.menu.quads;
+      for (id = i = 0, len = ref.length; i < len; id = ++i) {
+        quad = ref[id];
+        quadElement = this.container.find(".quad-" + id);
+        show = true;
+        isVisible = quadElement.is(":visible");
+        if (show && !isVisible) {
+          quadElement.show();
+        }
+        if (!show && isVisible) {
+          quadElement.hide();
+        }
+      }
+      return this.container.find('a').each((function(_this) {
+        return function(index, element) {
+          var item;
+          element = jQuery(element);
+          item = _this.menu.getItem(element.data());
+          isVisible = element.is(":visible");
+          show = item.isVisible();
+          if (show && !isVisible) {
+            element.show();
+          }
+          if (!show && isVisible) {
+            element.hide();
+          }
+          return console.log(item);
+        };
+      })(this));
     };
 
     Renderer.prototype.close = function() {
@@ -159,14 +210,14 @@
     Renderer.prototype.add = function(id, menuId, quad) {
       var item, itemElement, itemId, ref, results;
       if (quad.getTitle()) {
-        this.quads[id].append("<li class='quad-title'>" + (quad.getTitle()) + "</li>");
+        this.quads[id].append("<li class=\"quad-title\"\n	data-menu-id=\"" + menuId + "\"\n	data-quad-id=\"" + id + "\"\n	>\n	" + (quad.getTitle()) + "\n</li>");
       }
       ref = quad.items;
       results = [];
       for (itemId in ref) {
         item = ref[itemId];
         item.setMenu(this.menu);
-        itemElement = "<li>\n	<a href=\"" + (item.getHref()) + "\" \n		data-item-id=\"" + itemId + "\"\n		data-menu-id=\"" + menuId + "\"\n		data-quad-id=\"" + id + "\"	\n		>\n		" + (item.getTitle()) + "\n	</a>\n</li>";
+        itemElement = "<li>\n	<a href=\"" + (item.getHref()) + "\"\n		data-item-id=\"" + itemId + "\"\n		data-menu-id=\"" + menuId + "\"\n		data-quad-id=\"" + id + "\"\n		>\n		" + (item.getTitle()) + "\n	</a>\n</li>";
         if (id === 1 || id === 2) {
           results.push(this.quads[id].prepend(itemElement));
         } else {
@@ -180,7 +231,9 @@
 
   })();
 
-  this.Maslosoft.QuadMenu.Menu = (function() {
+  this.Maslosoft.QuadMenu.Menu = (function(superClass) {
+    extend(Menu, superClass);
+
     Menu.prototype.options = null;
 
     Menu.prototype.quads = [[], [], [], []];
@@ -225,7 +278,6 @@
     }
 
     Menu.prototype.regionClick = function(e) {
-      console.log(e);
       if (e.which === 3) {
         this.open(e.clientX, e.clientY);
         if (!this.options.browserContext) {
@@ -237,17 +289,11 @@
     };
 
     Menu.prototype.itemClick = function(e) {
-      var data, item, quad, quadItems;
+      var data, item;
       data = jQuery(e.target).data();
-      quadItems = this.quads[data.quadId];
-      if (quadItems) {
-        quad = quadItems[data.menuId];
-      }
-      if (quad) {
-        item = quad.items[data.itemId];
-      }
+      item = this.getItem(data);
       if (item) {
-        console.log(item.onClick(e, item));
+        item.onClick(e, item);
       }
       return e.stopPropagation();
     };
@@ -261,6 +307,25 @@
 
     Menu.prototype.prevent = function(e) {
       return e.preventDefault();
+    };
+
+    Menu.prototype.getItem = function(data) {
+      var item, quad, quadItems;
+      item = null;
+      quadItems = this.quads[data.quadId];
+      if (quadItems) {
+        quad = quadItems[data.menuId];
+      }
+      if (quad) {
+        item = quad.items[data.itemId];
+      }
+      return item;
+    };
+
+    Menu.prototype.getMenu = function(data) {};
+
+    Menu.prototype.getQuad = function(data) {
+      return this.quads[data.quadId];
     };
 
     Menu.prototype.open = function(x, y) {
@@ -295,7 +360,7 @@
 
     return Menu;
 
-  })();
+  })(this.Maslosoft.QuadMenu.ItemBase);
 
 }).call(this);
 

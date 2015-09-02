@@ -1,6 +1,7 @@
 coffees = [
 	'js/_ns.coffee',
 	'js/Options.coffee',
+	'js/ItemBase.coffee',
 	'js/Item.coffee',
 	'js/Quad.coffee',
 	'js/Renderer.coffee'

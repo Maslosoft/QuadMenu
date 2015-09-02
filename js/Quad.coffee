@@ -1,4 +1,4 @@
-class @Maslosoft.QuadMenu.Quad
+class @Maslosoft.QuadMenu.Quad  extends @Maslosoft.QuadMenu.ItemBase
 
 	#
 	# Title of quad. If not set, it will 
@@ -44,18 +44,3 @@ class @Maslosoft.QuadMenu.Quad
 	#
 	getPreferred: () ->
 		return -1
-	#
-	# Whenever quad should be visible.
-	# Return true to include quad in quad menu
-	# @return bool
-	#
-	isVisible: () ->
-		return true
-	
-	#
-	# Show quad only in selected region.
-	# Return null or empty string to show in each region.
-	# @return string selector
-	#
-	inRegion: () ->
-		return null

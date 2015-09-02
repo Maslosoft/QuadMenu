@@ -1,4 +1,4 @@
-class @Maslosoft.QuadMenu.Menu
+class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 	
 	#
 	# Options
@@ -86,7 +86,6 @@ class @Maslosoft.QuadMenu.Menu
 	# @param e Event
 	#
 	regionClick: (e) =>
-		console.log e
 		if e.which is 3
 			# Show on right button click
 			@open e.clientX, e.clientY
@@ -101,15 +100,9 @@ class @Maslosoft.QuadMenu.Menu
 	#	
 	itemClick: (e) =>
 		data = jQuery(e.target).data()
-		quadItems = @quads[data.quadId]
-		if quadItems
-			# @var quad Maslosoft.QuadMenu.Quad
-			quad = quadItems[data.menuId]
-		if quad
-			# @var quad Maslosoft.QuadMenu.Item
-			item = quad.items[data.itemId]
+		item = @getItem(data)
 		if item
-			console.log item.onClick(e, item)
+			item.onClick(e, item)
 		
 		e.stopPropagation()
 		
@@ -121,6 +114,23 @@ class @Maslosoft.QuadMenu.Menu
 		
 	prevent: (e) ->
 		e.preventDefault()
+	
+	getItem: (data) ->
+		item = null
+		quadItems = @quads[data.quadId]
+		if quadItems
+			# @var quad Maslosoft.QuadMenu.Quad
+			quad = quadItems[data.menuId]
+		if quad
+			# @var quad Maslosoft.QuadMenu.Item
+			item = quad.items[data.itemId]
+		return item
+	
+	getMenu: (data) ->
+		
+	
+	getQuad: (data) ->
+		return @quads[data.quadId]
 	
 	open: (x, y) =>
 		@renderer.open x, y
