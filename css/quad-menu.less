@@ -1,9 +1,6 @@
 @quadTitleBg: #222;
 @quadTitleColor: #fff;
 
-@fontSize: 14px;
-@lineHeight: 20px;
-
 @itemBg: lighten(@quadTitleBg, 10%);
 @itemColor: #fff;
 @itemHoverBg: #0e91d3;
@@ -12,6 +9,9 @@
 @padH: 2px;
 @padV: 5px;
 @padding: @padH @padV;
+@itemPadH: @padH;
+@itemPadV: 12px;
+@itemPadding: @itemPadH @itemPadV;
 
 .maslosoft-quad-menu{
 	position: absolute;
@@ -20,6 +20,17 @@
 	background:red;
 	display:none;
 	white-space: nowrap;
+	
+	.quad-spot{
+		position: absolute;
+		width: 6px;
+		heighT: 6px;
+		left: -3px;
+		top: -3px;
+		background: @itemHoverBg;
+		z-index: 1;
+		border-radius: 50%;
+	}
 	
 	ul, li{
 		margin: 0;
@@ -34,7 +45,7 @@
 			display: block;
 			text-decoration: none;
 			color: @itemColor;
-			padding: @padding;
+			padding: @itemPadding;
 			&:hover{
 				background: @itemHoverBg;
 				color:@itemHoverColor;

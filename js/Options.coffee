@@ -10,6 +10,13 @@ class @Maslosoft.QuadMenu.Options
 	region: 'document'
 	
 	#
+	# Whenever to show spot
+	#
+	# @var bool
+	#
+	showSpot: true
+	
+	#
 	# Event on which menu will react. Default to mousedown.
 	# This applies for both menu opening and items clicking.
 	#

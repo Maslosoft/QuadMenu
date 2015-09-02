@@ -31,14 +31,20 @@ class @Maslosoft.QuadMenu.Renderer
 	#
 	constructor: (@menu) ->
 		
-		
+		# Create menu container
 		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
 		
+		# Show spot if enabled
+		if @menu.options.showSpot
+			@container.append """<div class="quad-spot" /> """
+		
+		# Create empty quads
 		for id in [0 ... 4]
 			quad = jQuery "<ul class='quad-#{id}' />"
 			@quads.push quad
 			@container.append quad
 		
+		# Attach it to body
 		jQuery('body').append @container
 		
 	#

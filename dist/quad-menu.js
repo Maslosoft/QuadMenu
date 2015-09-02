@@ -14,6 +14,8 @@
 
     Options.prototype.region = 'document';
 
+    Options.prototype.showSpot = true;
+
     Options.prototype.event = 'mousedown';
 
     browserContext = false;
@@ -133,6 +135,9 @@
       this.close = bind(this.close, this);
       this.open = bind(this.open, this);
       this.container = jQuery("<div class=\"maslosoft-quad-menu\"></div>");
+      if (this.menu.options.showSpot) {
+        this.container.append("<div class=\"quad-spot\" /> ");
+      }
       for (id = i = 0; i < 4; id = ++i) {
         quad = jQuery("<ul class='quad-" + id + "' />");
         this.quads.push(quad);
@@ -191,26 +196,24 @@
       }
       this.close = bind(this.close, this);
       this.open = bind(this.open, this);
-      this.stop = bind(this.stop, this);
       this.preventContext = bind(this.preventContext, this);
-      this.onClick = bind(this.onClick, this);
+      this.itemClick = bind(this.itemClick, this);
+      this.regionClick = bind(this.regionClick, this);
       this.options = new Maslosoft.QuadMenu.Options(options);
       this.renderer = new Maslosoft.QuadMenu.Renderer(this);
-      console.log(this.options);
       ref = this.options.quads;
       for (i = 0, len = ref.length; i < len; i++) {
         quad = ref[i];
         this.add(quad);
       }
-      console.log(this.options.region);
       if (this.options.region === 'document') {
-        jQuery(document).on(this.options.event, this.onClick);
+        jQuery(document).on(this.options.event, this.regionClick);
         jQuery(document).on('contextmenu', this.preventContext);
       } else {
-        jQuery(document).on(this.options.event, this.options.region, this.onClick);
+        jQuery(document).on(this.options.event, this.options.region, this.regionClick);
         jQuery(document).on('contextmenu', this.options.region, this.preventContext);
       }
-      this.renderer.container.on(this.options.event, this.stop);
+      this.renderer.container.on(this.options.event, this.itemClick);
       this.renderer.container.on('click', this.prevent);
       jQuery(document).on('keydown', (function(_this) {
         return function(e) {
@@ -221,7 +224,7 @@
       })(this));
     }
 
-    Menu.prototype.onClick = function(e) {
+    Menu.prototype.regionClick = function(e) {
       console.log(e);
       if (e.which === 3) {
         this.open(e.clientX, e.clientY);
@@ -233,14 +236,7 @@
       }
     };
 
-    Menu.prototype.preventContext = function(e) {
-      e.preventDefault();
-      if (!this.options.browserContext) {
-        return e.preventDefault();
-      }
-    };
-
-    Menu.prototype.stop = function(e) {
+    Menu.prototype.itemClick = function(e) {
       var data, item, quad, quadItems;
       data = jQuery(e.target).data();
       quadItems = this.quads[data.quadId];
@@ -254,6 +250,13 @@
         console.log(item.onClick(e, item));
       }
       return e.stopPropagation();
+    };
+
+    Menu.prototype.preventContext = function(e) {
+      e.preventDefault();
+      if (!this.options.browserContext) {
+        return e.preventDefault();
+      }
     };
 
     Menu.prototype.prevent = function(e) {
@@ -281,7 +284,6 @@
         ref = this.quads;
         for (id = j = 0, len = ref.length; j < len; id = ++j) {
           quads = ref[id];
-          console.log(quad);
           if (quads.length === size) {
             menuId = quads.push(quad);
             this.renderer.add(id, menuId - 1, quad);

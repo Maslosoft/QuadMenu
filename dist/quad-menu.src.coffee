@@ -15,6 +15,13 @@ class @Maslosoft.QuadMenu.Options
 	region: 'document'
 	
 	#
+	# Whenever to show spot
+	#
+	# @var bool
+	#
+	showSpot: true
+	
+	#
 	# Event on which menu will react. Default to mousedown.
 	# This applies for both menu opening and items clicking.
 	#
@@ -178,14 +185,20 @@ class @Maslosoft.QuadMenu.Renderer
 	#
 	constructor: (@menu) ->
 		
-		
+		# Create menu container
 		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
 		
+		# Show spot if enabled
+		if @menu.options.showSpot
+			@container.append """<div class="quad-spot" /> """
+		
+		# Create empty quads
 		for id in [0 ... 4]
 			quad = jQuery "<ul class='quad-#{id}' />"
 			@quads.push quad
 			@container.append quad
 		
+		# Attach it to body
 		jQuery('body').append @container
 		
 	#
@@ -279,7 +292,7 @@ class @Maslosoft.QuadMenu.Menu
 	
 	#
 	# Quad menu entry class
-	# @param Maslosoft.QuadMenu.Options options|object
+	# @param options Maslosoft.QuadMenu.Options options|object
 	#
 	constructor: (options = {}) ->
 		
@@ -289,26 +302,21 @@ class @Maslosoft.QuadMenu.Menu
 		# Assign renderer
 		@renderer = new Maslosoft.QuadMenu.Renderer @
 		
-		console.log @options
-		
 		# Add quads
 		for quad in @options.quads
 			@add quad
 		
-		console.log @options.region
-		
 		if @options.region is 'document'
 			# Attach directly to document if region is document
-			jQuery(document).on @options.event, @onClick
+			jQuery(document).on @options.event, @regionClick
 			jQuery(document).on 'contextmenu', @preventContext
 		else
 			# Attach by delegate to selected region
-			jQuery(document).on @options.event, @options.region, @onClick
+			jQuery(document).on @options.event, @options.region, @regionClick
 			jQuery(document).on 'contextmenu', @options.region, @preventContext
 		
-		# Stop propagation when has event (click or mousedown) 
-		# on menu itself
-		@renderer.container.on @options.event, @stop
+		# Attach click on item 
+		@renderer.container.on @options.event, @itemClick
 		
 		# Prevent click events default action on menu.
 		# This is to operate on mousedown, known as RapidClick™.
@@ -321,13 +329,12 @@ class @Maslosoft.QuadMenu.Menu
 			# ESC key code is 27
 			if e.keyCode is 27
 				@close()
-			
-		# Close if clicked elsewere
-		
 		
 	#
-	# TODO Rename to regionClick
-	onClick: (e) =>
+	# Click on active region
+	# @param e Event
+	#
+	regionClick: (e) =>
 		console.log e
 		if e.which is 3
 			# Show on right button click
@@ -337,15 +344,11 @@ class @Maslosoft.QuadMenu.Menu
 		else
 			# Close on other buttons 
 			@close()
-		
-	preventContext: (e) =>
-		e.preventDefault()
-		if not @options.browserContext
-			e.preventDefault()
-
 	#
-	# TODO Rename to menu click or item click			
-	stop: (e) =>
+	# Click on item
+	# @param e Event
+	#	
+	itemClick: (e) =>
 		data = jQuery(e.target).data()
 		quadItems = @quads[data.quadId]
 		if quadItems
@@ -358,6 +361,12 @@ class @Maslosoft.QuadMenu.Menu
 			console.log item.onClick(e, item)
 		
 		e.stopPropagation()
+		
+	preventContext: (e) =>
+		e.preventDefault()
+		if not @options.browserContext
+			e.preventDefault()
+
 		
 	prevent: (e) ->
 		e.preventDefault()
@@ -386,7 +395,6 @@ class @Maslosoft.QuadMenu.Menu
 		for size in [0 ... 4] 
 			# Push into first empty or low num quad
 			for quads, id in @quads
-				console.log quad
 				if quads.length is size
 					menuId = quads.push quad
 					@renderer.add id, menuId - 1, quad
