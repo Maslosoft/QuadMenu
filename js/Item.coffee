@@ -10,7 +10,7 @@ class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 	
 	#
 	# Menu instance. This help closing menu if nessesary.
-	# @var Maslosoft.QuadMenu.Menu
+	# @var Maslosoft.QuadMenu.QuadMenu
 	#
 	menu: ''
 	

@@ -1,12 +1,15 @@
 coffees = [
-	'js/_ns.coffee',
-	'js/Options.coffee',
-	'js/ItemBase.coffee',
-	'js/Item.coffee',
-	'js/Quad.coffee',
+	'js/_ns.coffee'
+	'js/Options.coffee'
+	'js/ItemBase.coffee'
+	'js/Item.coffee'
+	'js/Menu.coffee'
+	'js/Quad.coffee'
+	'js/QuadMenu.coffee'
 	'js/Renderer.coffee'
 	'js/Menu.coffee'
 ]
+
 less = [
 	'css/quad-menu.less'
 ]

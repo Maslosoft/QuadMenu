@@ -32,11 +32,11 @@ class @Maslosoft.QuadMenu.Options
 	browserContext = false
 	
 	#
-	# Quads which will be added to menu
+	# Menus which will be added to quads
 	#
-	# @var Maslosoft.QuadMenu.Quad[]
+	# @var Maslosoft.QuadMenu.Menu[]
 	#
-	quads: []
+	menus: []
 	
 	#
 	# Options constructor. Will merge provided params with defaults

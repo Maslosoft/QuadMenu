@@ -37,11 +37,11 @@ class @Maslosoft.QuadMenu.Options
 	browserContext = false
 	
 	#
-	# Quads which will be added to menu
+	# Menus which will be added to quads
 	#
-	# @var Maslosoft.QuadMenu.Quad[]
+	# @var Maslosoft.QuadMenu.Menu[]
 	#
-	quads: []
+	menus: []
 	
 	#
 	# Options constructor. Will merge provided params with defaults
@@ -56,8 +56,45 @@ class @Maslosoft.QuadMenu.Options
 #
 #
 class @Maslosoft.QuadMenu.ItemBase
-	
+
+	id: 0
+
+	length: 0
+
 	visible: true
+
+	#
+	# Quad items
+	# @var Maslosoft.QuadMenu.Item[]
+	#
+	items: []
+
+	constructor: (options = {}) ->
+
+		# This is to avid reference problems
+		@items = new Array
+
+		# Init from options
+		for name, value of options
+			@[name] = value
+
+	add: (item) ->
+		@length++;
+		@items.push item
+		return @length - 1
+
+	get: (itemId) ->
+		if @items[itemId]
+			return @items[itemId]
+		return null
+
+	#
+	# Get quad menu items. This should return type 
+	# of Maslosoft.QuadMenu.Item or compatible.
+	# @return Maslosoft.QuadMenu.Item[]
+	#
+	getItems: () ->
+		return @items
 	
 	#
 	# Whenever quad should be visible.
@@ -76,6 +113,7 @@ class @Maslosoft.QuadMenu.ItemBase
 	#
 	inRegion: () ->
 		return null
+
 class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 
 	#
@@ -88,7 +126,7 @@ class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 	
 	#
 	# Menu instance. This help closing menu if nessesary.
-	# @var Maslosoft.QuadMenu.Menu
+	# @var Maslosoft.QuadMenu.QuadMenu
 	#
 	menu: ''
 	
@@ -116,45 +154,32 @@ class @Maslosoft.QuadMenu.Item extends @Maslosoft.QuadMenu.ItemBase
 
 	getHref: () ->
 		return '#'
-class @Maslosoft.QuadMenu.Quad  extends @Maslosoft.QuadMenu.ItemBase
+#
+# Menu class
+#
+#
+class @Maslosoft.QuadMenu.Menu  extends @Maslosoft.QuadMenu.ItemBase
 
 	#
-	# Title of quad. If not set, it will 
+	# Title of menu. If not set, it will
 	# @var string
 	#
 	title: ''
 
 	#
-	# Quad items
-	# @var Maslosoft.QuadMenu.Item[]
-	#
-	items: []
-
-	constructor: (options = {}) ->
-		for name, value of options
-			@[name] = value
-	
-	#
 	# Set title
 	# @param string title
 	#
 	setTitle: (@title) ->
-		
+
 	#
 	# Get quad title. This will appear on top of menu.
 	# @return string quad title
 	#
 	getTitle: () ->
 		return @title
-		
-	#
-	# Get quad menu items. This should return type 
-	# of Maslosoft.QuadMenu.Item or compatible.
-	# @return Maslosoft.QuadMenu.Item[]
-	#
-	getItems: () ->
-		
-	
+
+
 	#
 	# Get preferred quad starting conterclockwise from bottom right.
 	# Return -1 for auto which is default.
@@ -164,132 +189,14 @@ class @Maslosoft.QuadMenu.Quad  extends @Maslosoft.QuadMenu.ItemBase
 		return -1
 
 #
-# Renderer of Quad menu. This generates
-# HTML markup containing for quads
+# Quad class
 #
 #
-#
-#
-class @Maslosoft.QuadMenu.Renderer
-	
-	#
-	# Menu instance
-	# @var Maslosoft.QuadMenu.Menu
-	#
-	menu: null
-	
-	#
-	# Quad menu container
-	# @var jQuery
-	#
-	container: null
-	
-	#
-	# Quads html elements
-	# @var jQuery
-	#
-	quads: []
-	
-	#
-	# Class constructor
-	# @param Maslosoft.QuadMenu.Menu
-	#
-	constructor: (@menu) ->
-		
-		# Create menu container
-		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
-		
-		# Show spot if enabled
-		if @menu.options.showSpot
-			@container.append """<div class="quad-spot" /> """
-		
-		# Create empty quads
-		for id in [0 ... 4]
-			quad = jQuery "<div class='quad-#{id}' />"
-			@quads.push quad
-			@container.append quad
-		
-		# Attach it to body
-		jQuery('body').append @container
-		
-	#
-	# show quad menu at specified location
-	# @var int X coordinate
-	# @var int Y coordinate
-	#
-	open: (x, y) =>
-		@container.css 'left', x
-		@container.css 'top', y
-		@container.show()
-		
-		# Show or hide quads
-		for quad, id in @menu.quads
-			quadElement = @container.find ".quad-#{id}"
-			# show = quad.isVisible()
-			show = true
-			isVisible = quadElement.is ":visible"
-			if show and not isVisible
-				quadElement.show()
-			if not show and isVisible
-				quadElement.hide()
-				
-				
-		# Show or hide items
-		@container.find('a').each (index, element) =>
-			element = jQuery(element)
-			item = @menu.getItem element.data()
-			isVisible = element.is ":visible"
-			show = item.isVisible()
-			if show and not isVisible
-				element.show()
-			if not show and isVisible
-				element.hide()
-			
-			console.log item
-		
-	#
-	# Close context menu
-	#
-	#
-	close: () =>
-		@container.hide()
-	
-	#
-	# Add quad html markup
-	# @param int Id
-	# @param Maslosoft.QuadMenu.Quad 
-	#
-	add: (id, menuId, quad) =>
-		if quad.getTitle()
-			@quads[id].append """
-			<li class="quad-title"
-				data-menu-id="#{menuId}"
-				data-quad-id="#{id}"
-				>
-				#{quad.getTitle()}
-			</li>"""
-		for itemId, item of quad.items
-			item.setMenu @menu
-			
-			itemElement = """
-			<li>
-				<a href="#{item.getHref()}"
-					data-item-id="#{itemId}"
-					data-menu-id="#{menuId}"
-					data-quad-id="#{id}"
-					>
-					#{item.getTitle()}
-				</a>
-			</li>
-			"""
-			if id in [1, 2]
-				# Top quads - need prepend
-				@quads[id].prepend itemElement
-			else
-				# Bottom quads - need append
-				@quads[id].append itemElement
-		
-class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
+class Maslosoft.QuadMenu.Quad extends @Maslosoft.QuadMenu.ItemBase
+
+
+
+class @Maslosoft.QuadMenu.QuadMenu
 	
 	#
 	# Options
@@ -301,24 +208,12 @@ class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 	# Quads. This has structure of quad id and list of quads:
 	# 
 	# quads = [
-	#	0: [
 	#		new Maslosoft.QuadMenu.Quad,
 	#		new Maslosoft.QuadMenu.Quad
-	#	],
-	#	1: [
-	#		new Maslosoft.QuadMenu.Quad
-	#	]
 	# ]
 	# @var Maslosoft.QuadMenu.Quad[][]
 	#
-	quads: [
-		[],
-		[],
-		[],
-		[],
-	]
-	
-	
+	quads: []
 	
 	#
 	#
@@ -337,16 +232,23 @@ class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 	# @param options Maslosoft.QuadMenu.Options options|object
 	#
 	constructor: (options = {}) ->
-		
+
+		# For reference problems
+		@quads = new Array
+
 		# Merge options with defaults
 		@options = new Maslosoft.QuadMenu.Options(options)
 		
 		# Assign renderer
 		@renderer = new Maslosoft.QuadMenu.Renderer @
 		
-		# Add quads
-		for quad in @options.quads
-			@add quad
+		# Init quads
+		for id in [0 ... 4]
+			@quads[id] = new Maslosoft.QuadMenu.Quad {id: id}
+
+		# Add menus to quads
+		for menu in @options.menus
+			@add menu
 		
 		if @options.region is 'document'
 			# Attach directly to document if region is document
@@ -391,9 +293,10 @@ class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 	#	
 	itemClick: (e) =>
 		data = jQuery(e.target).data()
-		item = @getItem(data)
+		item = @getItem data
+		console.log item
 		if item
-			item.onClick(e, item)
+			item.onClick e, item
 		
 		e.stopPropagation()
 		
@@ -407,21 +310,26 @@ class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 		e.preventDefault()
 	
 	getItem: (data) ->
-		item = null
-		quadItems = @quads[data.quadId]
-		if quadItems
-			# @var quad Maslosoft.QuadMenu.Quad
-			quad = quadItems[data.menuId]
-		if quad
+		menu = @getMenu data
+		if menu
 			# @var quad Maslosoft.QuadMenu.Item
-			item = quad.items[data.itemId]
-		return item
+			return menu.get data.itemId
+		return null
 	
 	getMenu: (data) ->
-		
+		quad = @getQuad data
+		# @var quad Maslosoft.QuadMenu.Quad
+		if quad
+			# @var menu Maslosoft.QuadMenu.Menu
+			return quad.get data.menuId
+		return null
 	
 	getQuad: (data) ->
-		return @quads[data.quadId]
+		console.log @quads
+		console.log data
+		if @quads[data.quadId]
+			return @quads[data.quadId]
+		return null
 	
 	open: (x, y) =>
 		@renderer.open x, y
@@ -430,24 +338,191 @@ class @Maslosoft.QuadMenu.Menu extends @Maslosoft.QuadMenu.ItemBase
 		@renderer.close()
 	
 	#
-	# Add quad to menu
-	# @param Maslosoft.QuadMenu.Quad
+	# Add menu to quad
+	# @param Maslosoft.QuadMenu.Menu
 	#
-	add: (quad) ->
-		preferred = parseInt quad.getPreferred()
-		
-		if preferred < -1 or preferred > 3
-			throw new Error('Preferred quad must be between -1 and 3')
-		
-		# Push into preferred space
+	add: (menu, preferred = -1) ->
+
+		# Get preferred from from menu if not set by function call
 		if preferred >= 0
-			@quads[preferred].push quad
+			preferred = parseInt menu.getPreferred()
+
+		# Sanitize prefered quad id
+		if preferred < -1 or preferred > 3
+			throw new Error('Preferred quad must be between `-1` and `3`')
+		
+		# Push into preferred quad
+		if preferred >= 0
+			@quads[preferred].items.push menu
 			
 		# Iterate over size of existing quads
-		for size in [0 ... 4] 
-			# Push into first empty or low num quad
-			for quads, id in @quads
-				if quads.length is size
-					menuId = quads.push quad
-					@renderer.add id, menuId - 1, quad
+		for size in [0 ... 4]
+
+			# Push into first empty quad or with lowest number of menus
+			for quad, id in @quads
+				q = quad
+				if q.length is size
+					menuId = q.add(menu)
+					@renderer.add id, menuId, menu
 					return
+
+#
+# Renderer of Quad menu. This generates
+# HTML markup containing for quads
+#
+#
+#
+#
+class @Maslosoft.QuadMenu.Renderer
+	
+	#
+	# Menu instance
+	# @var Maslosoft.QuadMenu.QuadMenu
+	#
+	menu: null
+	
+	#
+	# Quad menu container
+	# @var jQuery
+	#
+	container: null
+	
+	#
+	# Quad HTML elements
+	# @var jQuery
+	#
+	quads: []
+
+	#
+	# Menus HTML elements
+	# @var jQuery
+	#
+	menus: []
+
+	#
+	# Items HTML elements
+	# @var jQuery
+	#
+	items: []
+	
+	#
+	# Class constructor
+	# @param Maslosoft.QuadMenu.QuadMenu
+	#
+	constructor: (@menu) ->
+
+		@quads = new Array
+		@menus = new Array
+		@items = new Array
+
+		# Create menu container
+		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
+		
+		# Show spot if enabled
+		if @menu.options.showSpot
+			@container.append """<div class="quad-spot" /> """
+		
+		# Create empty quads
+		for quadId in [0 ... 4]
+			quad = jQuery "<div class='quad-#{quadId}' />"
+			@quads.push quad
+			@container.append quad
+		
+		# Attach it to body
+		jQuery('body').append @container
+		
+	#
+	# show quad menu at specified location
+	# @var int X coordinate
+	# @var int Y coordinate
+	#
+	open: (x, y) =>
+		@container.css 'left', x
+		@container.css 'top', y
+		@container.show()
+		
+		# Show or hide quads
+		for quad, quadId in @menu.quads
+			quadElement = @container.find ".quad-#{quadId}"
+			# show = quad.isVisible()
+			show = true
+			isVisible = quadElement.is ":visible"
+			if show and not isVisible
+				quadElement.show()
+			if not show and isVisible
+				quadElement.hide()
+				
+				
+		# Show or hide items
+		@container.find('a').each (index, element) =>
+			element = jQuery element
+			item = @menu.getItem element.data()
+			console.log element.data()
+			isVisible = element.is ":visible"
+			show = item.isVisible()
+			if show and not isVisible
+				element.show()
+			if not show and isVisible
+				element.hide()
+		
+	#
+	# Close context menu
+	#
+	#
+	close: () =>
+		@container.hide()
+	
+	getItem: (quadId, menuId, itemId) ->
+		return @items[quadId][menuId][itemId]
+
+	getMenu: (menuId, quadId) ->
+		return @menus[quadId][menuId]
+
+	getQuad: (quadId) ->
+		return @quads[quadId]
+
+	#
+	# Add menu html markup
+	# @param int quadId
+	# @param int menuId
+	# @param Maslosoft.QuadMenu.Menu 
+	#
+	add: (quadId, menuId, menu) =>
+
+		@menus[quadId] = []
+		@items[quadId] = []
+		@items[quadId][menuId] = []
+
+		menuElement = jQuery """<ul data-menu-id="#{menuId}" /> """
+		@menus[quadId][menuId] = menuElement
+		if menu.getTitle()
+			menuElement.append """
+			<li class="menu-title"
+				data-menu-id="#{menuId}"
+				data-quad-id="#{quadId}"
+				>
+				#{menu.getTitle()}
+			</li>"""
+		for itemId, item of menu.items
+			item.setMenu @menu
+			
+			itemElement = """
+			<li>
+				<a href="#{item.getHref()}"
+					data-item-id="#{itemId}"
+					data-menu-id="#{menuId}"
+					data-quad-id="#{quadId}"
+					>
+					#{item.getTitle()}
+				</a>
+			</li>
+			"""
+			menuElement.append itemElement
+			@items[quadId][menuId][itemId] = menuElement
+			if quadId in [1, 2]
+				# Top quads - need prepend
+				@quads[quadId].prepend menuElement
+			else
+				# Bottom quads - need append
+				@quads[quadId].append menuElement
+		

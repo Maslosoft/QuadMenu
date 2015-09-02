@@ -12,130 +12,129 @@ require '_header.php'
 	Close menu when I click item
 </label>
 <div id="quadsHide">
-	<?php foreach([0,1,2, 3] as $id):?>
-	<label data-quad-id="<?= $id; ?>">
-		<input type="checkbox" />
-		Hide quad <?= $id; ?>
-	</label>
-	<?php endforeach;?>
+	<?php foreach ([0, 1, 2, 3] as $id): ?>
+		<label data-quad-id="<?= $id; ?>">
+			<input type="checkbox" />
+			Hide quad <?= $id; ?>
+		</label>
+	<?php endforeach; ?>
 </div>
 <div id="itemsHide">
-	<?php foreach([0,1,2] as $id):?>
-	<label data-item-id="<?= $id; ?>"
-			data-menu-id="0"
-			data-quad-id="0">
-		<input type="checkbox" />
-		Hide item 0, 0, <?= $id; ?>
-	</label>
-	<?php endforeach;?>
+	<?php foreach ([0, 1, 2] as $id): ?>
+		<label data-item-id="<?= $id; ?>"
+				 data-menu-id="0"
+				 data-quad-id="0">
+			<input type="checkbox" />
+			Hide item 0, 0, <?= $id; ?>
+		</label>
+	<?php endforeach; ?>
 </div>
 <script>
-	jQuery(document).ready(function(){
-		var click = function(e, item){
+	jQuery(document).ready(function () {
+		var click = function (e, item) {
 			jQuery('#log').append("Clicked " + item.getTitle() + "<br />");
-			if(jQuery('#close').is(":checked")) {
+			if (jQuery('#close').is(":checked")) {
 				item.menu.close();
 			}
 		};
-		var quads = [];
-		var quad = new Maslosoft.QuadMenu.Quad({
-			title: 'First quad ever',
+		var menus = [];
+		var menu = new Maslosoft.QuadMenu.Menu({
+			title: 'First quad',
 			items: [
 				new Maslosoft.QuadMenu.Item({title: 'First item', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'First item 2', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'First item 3', onClick: click})
 			]
 		});
-		
-		quads.push(quad);
+
+		menus.push(menu);
 		var options = {
 			browserContext: true,
-			quads: quads
-		}
-		var menu = new Maslosoft.QuadMenu.Menu(options);
-		
-		
-		quad = new Maslosoft.QuadMenu.Quad({
+			menus: menus
+		};
+		var quadMenu = new Maslosoft.QuadMenu.QuadMenu(options);
+
+
+		menu = new Maslosoft.QuadMenu.Menu({
 			items: [
 				new Maslosoft.QuadMenu.Item({title: 'Second item', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Second item 2', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Second item 3', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Second item 4 (this one has longer title)', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Second item 5', onClick: click})
-				
+
 			]
 		});
-		quad.setTitle('Second quad ever');
-		menu.add(quad);
-		
-		quad = new Maslosoft.QuadMenu.Quad({
+		menu.setTitle('Second menu');
+		quadMenu.add(menu);
+
+		menu = new Maslosoft.QuadMenu.Menu({
 			items: [
 				new Maslosoft.QuadMenu.Item({title: 'Third item', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Third item 2', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Third item 3', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Third item 4 (longer title)', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Third item 5', onClick: click})
-				
+
 			]
 		});
-		quad.setTitle('Third quad ever');
-		menu.add(quad);
-		
-		quad = new Maslosoft.QuadMenu.Quad({
+		menu.setTitle('Third menu');
+		quadMenu.add(menu);
+
+		menu = new Maslosoft.QuadMenu.Menu({
 			items: [
 				new Maslosoft.QuadMenu.Item({title: 'Forth item', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Forth item 2', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Forth item 3', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Forth item 4', onClick: click})
-				
+
 			]
 		});
-		quad.setTitle('Forth quad ever');
-		menu.add(quad);
-		
-		quad = new Maslosoft.QuadMenu.Quad({
+		menu.setTitle('Forth menu');
+		quadMenu.add(menu);
+
+		menu = new Maslosoft.QuadMenu.Menu({
 			items: [
 				new Maslosoft.QuadMenu.Item({title: 'Fifth item', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Fifth item 2', onClick: click}),
 				new Maslosoft.QuadMenu.Item({title: 'Fifth item 3', onClick: click})
 			]
 		});
-		quad.setTitle('Fifth quad ever');
-		menu.add(quad);
-		
+		menu.setTitle('Fifth menu');
+		quadMenu.add(menu);
+
 		// Additional stuff
 		// Show/hide items
-		jQuery('#itemsHide').on('click', 'label', function(e){
+		jQuery('#itemsHide').on('click', 'label', function (e) {
 			e.stopPropagation();
 			var el = jQuery(e.target);
 			var box = el.find('checkbox');
 			var data = el.data();
-			if(data.itemId !== null){
-				item = menu.getItem(data);
-				if(item){
+			if (data.itemId !== null) {
+				var item = quadMenu.getItem(data);
+				if (item) {
 					item.isVisible(box.is(':checked'));
 				}
 			}
 		});
 		// Show hide quads
-		jQuery('#quadsHide').on('click', 'label', function(e){
+		jQuery('#quadsHide').on('click', 'label', function (e) {
 			e.stopPropagation();
 			var el = jQuery(e.target);
 			var box = el.find('checkbox');
 			var data = el.data();
-			if(data.quadId !== null){
-				item = menu.getQuad(data);
-				console.log(item);
-				if(item){
-					item.isVisible(box.is(':checked'));
+			if (data.quadId !== null) {
+				var quad = quadMenu.getQuad(data);
+				if (quad) {
+					quad.isVisible(box.is(':checked'));
 				}
 			}
 		});
 	});
 </script>
 <div id="log">
-	
+
 </div>
 <?php
-	require '_footer.php'
+require '_footer.php'
 ?>

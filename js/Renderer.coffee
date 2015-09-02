@@ -9,7 +9,7 @@ class @Maslosoft.QuadMenu.Renderer
 	
 	#
 	# Menu instance
-	# @var Maslosoft.QuadMenu.Menu
+	# @var Maslosoft.QuadMenu.QuadMenu
 	#
 	menu: null
 	
@@ -20,17 +20,33 @@ class @Maslosoft.QuadMenu.Renderer
 	container: null
 	
 	#
-	# Quads html elements
+	# Quad HTML elements
 	# @var jQuery
 	#
 	quads: []
+
+	#
+	# Menus HTML elements
+	# @var jQuery
+	#
+	menus: []
+
+	#
+	# Items HTML elements
+	# @var jQuery
+	#
+	items: []
 	
 	#
 	# Class constructor
-	# @param Maslosoft.QuadMenu.Menu
+	# @param Maslosoft.QuadMenu.QuadMenu
 	#
 	constructor: (@menu) ->
-		
+
+		@quads = new Array
+		@menus = new Array
+		@items = new Array
+
 		# Create menu container
 		@container = jQuery """<div class="maslosoft-quad-menu"></div>"""
 		
@@ -39,8 +55,8 @@ class @Maslosoft.QuadMenu.Renderer
 			@container.append """<div class="quad-spot" /> """
 		
 		# Create empty quads
-		for id in [0 ... 4]
-			quad = jQuery "<div class='quad-#{id}' />"
+		for quadId in [0 ... 4]
+			quad = jQuery "<div class='quad-#{quadId}' />"
 			@quads.push quad
 			@container.append quad
 		
@@ -58,8 +74,8 @@ class @Maslosoft.QuadMenu.Renderer
 		@container.show()
 		
 		# Show or hide quads
-		for quad, id in @menu.quads
-			quadElement = @container.find ".quad-#{id}"
+		for quad, quadId in @menu.quads
+			quadElement = @container.find ".quad-#{quadId}"
 			# show = quad.isVisible()
 			show = true
 			isVisible = quadElement.is ":visible"
@@ -71,16 +87,15 @@ class @Maslosoft.QuadMenu.Renderer
 				
 		# Show or hide items
 		@container.find('a').each (index, element) =>
-			element = jQuery(element)
+			element = jQuery element
 			item = @menu.getItem element.data()
+			console.log element.data()
 			isVisible = element.is ":visible"
 			show = item.isVisible()
 			if show and not isVisible
 				element.show()
 			if not show and isVisible
 				element.hide()
-			
-			console.log item
 		
 	#
 	# Close context menu
@@ -89,21 +104,38 @@ class @Maslosoft.QuadMenu.Renderer
 	close: () =>
 		@container.hide()
 	
+	getItem: (quadId, menuId, itemId) ->
+		return @items[quadId][menuId][itemId]
+
+	getMenu: (menuId, quadId) ->
+		return @menus[quadId][menuId]
+
+	getQuad: (quadId) ->
+		return @quads[quadId]
+
 	#
-	# Add quad html markup
-	# @param int Id
-	# @param Maslosoft.QuadMenu.Quad 
+	# Add menu html markup
+	# @param int quadId
+	# @param int menuId
+	# @param Maslosoft.QuadMenu.Menu 
 	#
-	add: (id, menuId, quad) =>
-		if quad.getTitle()
-			@quads[id].append """
-			<li class="quad-title"
+	add: (quadId, menuId, menu) =>
+
+		@menus[quadId] = []
+		@items[quadId] = []
+		@items[quadId][menuId] = []
+
+		menuElement = jQuery """<ul data-menu-id="#{menuId}" /> """
+		@menus[quadId][menuId] = menuElement
+		if menu.getTitle()
+			menuElement.append """
+			<li class="menu-title"
 				data-menu-id="#{menuId}"
-				data-quad-id="#{id}"
+				data-quad-id="#{quadId}"
 				>
-				#{quad.getTitle()}
+				#{menu.getTitle()}
 			</li>"""
-		for itemId, item of quad.items
+		for itemId, item of menu.items
 			item.setMenu @menu
 			
 			itemElement = """
@@ -111,16 +143,18 @@ class @Maslosoft.QuadMenu.Renderer
 				<a href="#{item.getHref()}"
 					data-item-id="#{itemId}"
 					data-menu-id="#{menuId}"
-					data-quad-id="#{id}"
+					data-quad-id="#{quadId}"
 					>
 					#{item.getTitle()}
 				</a>
 			</li>
 			"""
-			if id in [1, 2]
+			menuElement.append itemElement
+			@items[quadId][menuId][itemId] = menuElement
+			if quadId in [1, 2]
 				# Top quads - need prepend
-				@quads[id].prepend itemElement
+				@quads[quadId].prepend menuElement
 			else
 				# Bottom quads - need append
-				@quads[id].append itemElement
+				@quads[quadId].append menuElement
 		

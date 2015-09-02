@@ -1,46 +1,7 @@
-class @Maslosoft.QuadMenu.Quad  extends @Maslosoft.QuadMenu.ItemBase
+#
+# Quad class
+#
+#
+class Maslosoft.QuadMenu.Quad extends @Maslosoft.QuadMenu.ItemBase
 
-	#
-	# Title of quad. If not set, it will 
-	# @var string
-	#
-	title: ''
 
-	#
-	# Quad items
-	# @var Maslosoft.QuadMenu.Item[]
-	#
-	items: []
-
-	constructor: (options = {}) ->
-		for name, value of options
-			@[name] = value
-	
-	#
-	# Set title
-	# @param string title
-	#
-	setTitle: (@title) ->
-		
-	#
-	# Get quad title. This will appear on top of menu.
-	# @return string quad title
-	#
-	getTitle: () ->
-		return @title
-		
-	#
-	# Get quad menu items. This should return type 
-	# of Maslosoft.QuadMenu.Item or compatible.
-	# @return Maslosoft.QuadMenu.Item[]
-	#
-	getItems: () ->
-		
-	
-	#
-	# Get preferred quad starting conterclockwise from bottom right.
-	# Return -1 for auto which is default.
-	# @return int preferred quad
-	#
-	getPreferred: () ->
-		return -1
