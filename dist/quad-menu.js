@@ -42,6 +42,8 @@
   this.Maslosoft.QuadMenu.ItemBase = (function() {
     ItemBase.prototype.id = 0;
 
+    ItemBase.prototype.parent = null;
+
     ItemBase.prototype.length = 0;
 
     ItemBase.prototype.visible = true;
@@ -53,7 +55,7 @@
       if (options == null) {
         options = {};
       }
-      this.items = new Array;
+      this.reset();
       for (name in options) {
         value = options[name];
         this[name] = value;
@@ -61,9 +63,19 @@
     }
 
     ItemBase.prototype.add = function(item) {
+      var id;
       this.length++;
       this.items.push(item);
-      return this.length - 1;
+      id = this.length - 1;
+      item.id = id;
+      item.parent = this;
+      return id;
+    };
+
+    ItemBase.prototype.reset = function() {
+      this.parent = null;
+      this.length = 0;
+      return this.items = new Array;
     };
 
     ItemBase.prototype.get = function(itemId) {
@@ -142,8 +154,21 @@
   this.Maslosoft.QuadMenu.Menu = (function(superClass) {
     extend(Menu, superClass);
 
-    function Menu() {
-      return Menu.__super__.constructor.apply(this, arguments);
+    function Menu(options) {
+      var i, id, item, len, ref;
+      if (options == null) {
+        options = {};
+      }
+      Menu.__super__.constructor.call(this, options);
+      if (options.items) {
+        this.reset();
+        ref = options.items;
+        for (id = i = 0, len = ref.length; i < len; id = ++i) {
+          item = ref[id];
+          item = new Maslosoft.QuadMenu.Item(item);
+          this.add(item);
+        }
+      }
     }
 
     Menu.prototype.title = '';
@@ -164,7 +189,7 @@
 
   })(this.Maslosoft.QuadMenu.ItemBase);
 
-  Maslosoft.QuadMenu.Quad = (function(superClass) {
+  this.Maslosoft.QuadMenu.Quad = (function(superClass) {
     extend(Quad, superClass);
 
     function Quad() {
@@ -240,7 +265,6 @@
       var data, item;
       data = jQuery(e.target).data();
       item = this.getItem(data);
-      console.log(item);
       if (item) {
         item.onClick(e, item);
       }
@@ -277,8 +301,6 @@
     };
 
     QuadMenu.prototype.getQuad = function(data) {
-      console.log(this.quads);
-      console.log(data);
       if (this.quads[data.quadId]) {
         return this.quads[data.quadId];
       }
@@ -294,7 +316,7 @@
     };
 
     QuadMenu.prototype.add = function(menu, preferred) {
-      var i, id, j, len, menuId, q, quad, ref, size;
+      var i, j, len, quad, ref, size;
       if (preferred == null) {
         preferred = -1;
       }
@@ -309,12 +331,11 @@
       }
       for (size = i = 0; i < 4; size = ++i) {
         ref = this.quads;
-        for (id = j = 0, len = ref.length; j < len; id = ++j) {
-          quad = ref[id];
-          q = quad;
-          if (q.length === size) {
-            menuId = q.add(menu);
-            this.renderer.add(id, menuId, menu);
+        for (j = 0, len = ref.length; j < len; j++) {
+          quad = ref[j];
+          if (quad.length === size) {
+            quad.add(menu);
+            this.renderer.add(quad, menu);
             return;
           }
         }
@@ -351,46 +372,68 @@
       }
       for (quadId = i = 0; i < 4; quadId = ++i) {
         quad = jQuery("<div class='quad-" + quadId + "' />");
-        this.quads.push(quad);
+        this.quads[quadId] = quad;
+        this.menus[quadId] = new Array;
+        this.items[quadId] = new Array;
         this.container.append(quad);
       }
       jQuery('body').append(this.container);
     }
 
     Renderer.prototype.open = function(x, y) {
-      var i, isVisible, len, quad, quadElement, quadId, ref, show;
+      var i, item, itemElement, itemId, j, k, len, len1, len2, menu, menuElement, menuId, quad, quadElement, quadId, ref, ref1, ref2, results, visibleItems, visibleMenus;
       this.container.css('left', x);
       this.container.css('top', y);
       this.container.show();
       ref = this.menu.quads;
+      results = [];
       for (quadId = i = 0, len = ref.length; i < len; quadId = ++i) {
         quad = ref[quadId];
-        quadElement = this.container.find(".quad-" + quadId);
-        show = true;
-        isVisible = quadElement.is(":visible");
-        if (show && !isVisible) {
-          quadElement.show();
+        quadElement = this.getQuad(quadId);
+        visibleMenus = 0;
+        ref1 = quad.items;
+        for (menuId = j = 0, len1 = ref1.length; j < len1; menuId = ++j) {
+          menu = ref1[menuId];
+          menuElement = this.getMenu(quadId, menuId);
+          visibleItems = 0;
+          ref2 = menu.items;
+          for (itemId = k = 0, len2 = ref2.length; k < len2; itemId = ++k) {
+            item = ref2[itemId];
+            itemElement = this.getItem(quadId, menuId, itemId);
+            visibleItems += this.setVisibilityOf(item, itemElement);
+          }
+          if (visibleItems === 0) {
+            menuElement.hide();
+          } else {
+            visibleMenus += this.setVisibilityOf(menu, menuElement);
+          }
         }
-        if (!show && isVisible) {
+        if (visibleMenus === 0) {
           quadElement.hide();
         }
+        results.push(this.setVisibilityOf(quad, quadElement));
       }
-      return this.container.find('a').each((function(_this) {
-        return function(index, element) {
-          var item;
-          element = jQuery(element);
-          item = _this.menu.getItem(element.data());
-          console.log(element.data());
-          isVisible = element.is(":visible");
-          show = item.isVisible();
-          if (show && !isVisible) {
-            element.show();
-          }
-          if (!show && isVisible) {
-            return element.hide();
-          }
-        };
-      })(this));
+      return results;
+    };
+
+    Renderer.prototype.setVisibilityOf = function(item, element, parent, perentElement) {
+      var isVisible, show;
+      if (parent == null) {
+        parent = null;
+      }
+      if (perentElement == null) {
+        perentElement = null;
+      }
+      show = item.isVisible();
+      isVisible = element.is(":visible");
+      if (show) {
+        element.show();
+        return 1;
+      }
+      if (!show) {
+        element.hide();
+        return 0;
+      }
     };
 
     Renderer.prototype.close = function() {
@@ -398,22 +441,33 @@
     };
 
     Renderer.prototype.getItem = function(quadId, menuId, itemId) {
+      if (quadId > 3 || quadId < 0) {
+        throw new Error("Bad quad id must be in `0 ... 3` however `" + quadId + "` given");
+      }
       return this.items[quadId][menuId][itemId];
     };
 
-    Renderer.prototype.getMenu = function(menuId, quadId) {
+    Renderer.prototype.getMenu = function(quadId, menuId) {
+      if (quadId > 3 || quadId < 0) {
+        throw new Error("Bad quad id must be in `0 ... 3` however `" + quadId + "` given");
+      }
       return this.menus[quadId][menuId];
     };
 
     Renderer.prototype.getQuad = function(quadId) {
+      if (quadId > 3 || quadId < 0) {
+        throw new Error("Bad quad id must be in `0 ... 3` however `" + quadId + "` given");
+      }
       return this.quads[quadId];
     };
 
-    Renderer.prototype.add = function(quadId, menuId, menu) {
-      var item, itemElement, itemId, menuElement, ref, results;
-      this.menus[quadId] = [];
-      this.items[quadId] = [];
-      this.items[quadId][menuId] = [];
+    Renderer.prototype.add = function(quad, menu) {
+      var item, itemElement, itemId, menuElement, menuId, quadId, ref, results;
+      quadId = quad.id;
+      menuId = menu.id;
+      if (!this.items[quadId][menuId]) {
+        this.items[quadId][menuId] = [];
+      }
       menuElement = jQuery("<ul data-menu-id=\"" + menuId + "\" /> ");
       this.menus[quadId][menuId] = menuElement;
       if (menu.getTitle()) {
@@ -424,9 +478,9 @@
       for (itemId in ref) {
         item = ref[itemId];
         item.setMenu(this.menu);
-        itemElement = "<li>\n	<a href=\"" + (item.getHref()) + "\"\n		data-item-id=\"" + itemId + "\"\n		data-menu-id=\"" + menuId + "\"\n		data-quad-id=\"" + quadId + "\"\n		>\n		" + (item.getTitle()) + "\n	</a>\n</li>";
+        itemElement = jQuery("<li>\n	<a href=\"" + (item.getHref()) + "\"\n		data-item-id=\"" + itemId + "\"\n		data-menu-id=\"" + menuId + "\"\n		data-quad-id=\"" + quadId + "\"\n		>\n		" + (item.getTitle()) + "\n	</a>\n</li>");
         menuElement.append(itemElement);
-        this.items[quadId][menuId][itemId] = menuElement;
+        this.items[quadId][menuId][itemId] = itemElement;
         if (quadId === 1 || quadId === 2) {
           results.push(this.quads[quadId].prepend(menuElement));
         } else {

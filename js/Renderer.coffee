@@ -9,37 +9,43 @@ class @Maslosoft.QuadMenu.Renderer
 	
 	#
 	# Menu instance
+	#
 	# @var Maslosoft.QuadMenu.QuadMenu
 	#
 	menu: null
 	
 	#
 	# Quad menu container
+	#
 	# @var jQuery
 	#
 	container: null
 	
 	#
 	# Quad HTML elements
+	#
 	# @var jQuery
 	#
 	quads: []
 
 	#
 	# Menus HTML elements
+	#
 	# @var jQuery
 	#
 	menus: []
 
 	#
 	# Items HTML elements
+	#
 	# @var jQuery
 	#
 	items: []
 	
 	#
 	# Class constructor
-	# @param Maslosoft.QuadMenu.QuadMenu
+	#
+	# @param Maslosoft.QuadMenu.QuadMenu menu
 	#
 	constructor: (@menu) ->
 
@@ -57,7 +63,9 @@ class @Maslosoft.QuadMenu.Renderer
 		# Create empty quads
 		for quadId in [0 ... 4]
 			quad = jQuery "<div class='quad-#{quadId}' />"
-			@quads.push quad
+			@quads[quadId] = quad
+			@menus[quadId] = new Array
+			@items[quadId] = new Array
 			@container.append quad
 		
 		# Attach it to body
@@ -73,30 +81,45 @@ class @Maslosoft.QuadMenu.Renderer
 		@container.css 'top', y
 		@container.show()
 		
-		# Show or hide quads
+		# Show or hide quads, menus, items
 		for quad, quadId in @menu.quads
-			quadElement = @container.find ".quad-#{quadId}"
-			# show = quad.isVisible()
-			show = true
-			isVisible = quadElement.is ":visible"
-			if show and not isVisible
-				quadElement.show()
-			if not show and isVisible
+
+			quadElement = @getQuad quadId
+			visibleMenus = 0
+
+			for menu, menuId in quad.items
+
+				menuElement = @getMenu quadId, menuId
+				visibleItems = 0
+
+				for item, itemId in menu.items
+					itemElement = @getItem quadId, menuId, itemId
+					visibleItems += @setVisibilityOf item, itemElement
+				
+				if visibleItems is 0
+					menuElement.hide()
+				else
+					visibleMenus += @setVisibilityOf menu, menuElement
+
+			if visibleMenus is 0
 				quadElement.hide()
-				
-				
-		# Show or hide items
-		@container.find('a').each (index, element) =>
-			element = jQuery element
-			item = @menu.getItem element.data()
-			console.log element.data()
-			isVisible = element.is ":visible"
-			show = item.isVisible()
-			if show and not isVisible
-				element.show()
-			if not show and isVisible
-				element.hide()
-		
+			
+			@setVisibilityOf quad, quadElement
+	#
+	# Set visibility of element
+	#
+	# @return int 1 if visible
+	#
+	setVisibilityOf: (item, element, parent = null, perentElement = null) ->
+		show = item.isVisible()
+		isVisible = element.is ":visible"
+		if show
+			element.show()
+			return 1
+		if not show
+			element.hide()
+			return 0
+
 	#
 	# Close context menu
 	#
@@ -105,25 +128,34 @@ class @Maslosoft.QuadMenu.Renderer
 		@container.hide()
 	
 	getItem: (quadId, menuId, itemId) ->
+		if quadId > 3 or quadId < 0
+			throw new Error("Bad quad id must be in `0 ... 3` however `#{quadId}` given")
+
 		return @items[quadId][menuId][itemId]
 
-	getMenu: (menuId, quadId) ->
+	getMenu: (quadId, menuId) ->
+		if quadId > 3 or quadId < 0
+			throw new Error("Bad quad id must be in `0 ... 3` however `#{quadId}` given")
+		
 		return @menus[quadId][menuId]
 
 	getQuad: (quadId) ->
+		if quadId > 3 or quadId < 0
+			throw new Error("Bad quad id must be in `0 ... 3` however `#{quadId}` given")
+
 		return @quads[quadId]
 
 	#
 	# Add menu html markup
-	# @param int quadId
-	# @param int menuId
-	# @param Maslosoft.QuadMenu.Menu 
+	# @param Maslosoft.QuadMenu.Quad quad
+	# @param Maslosoft.QuadMenu.Menu menu
 	#
-	add: (quadId, menuId, menu) =>
-
-		@menus[quadId] = []
-		@items[quadId] = []
-		@items[quadId][menuId] = []
+	add: (quad, menu) =>
+		quadId = quad.id
+		menuId = menu.id
+		
+		if not @items[quadId][menuId]
+			@items[quadId][menuId] = []
 
 		menuElement = jQuery """<ul data-menu-id="#{menuId}" /> """
 		@menus[quadId][menuId] = menuElement
@@ -138,7 +170,7 @@ class @Maslosoft.QuadMenu.Renderer
 		for itemId, item of menu.items
 			item.setMenu @menu
 			
-			itemElement = """
+			itemElement = jQuery """
 			<li>
 				<a href="#{item.getHref()}"
 					data-item-id="#{itemId}"
@@ -150,7 +182,7 @@ class @Maslosoft.QuadMenu.Renderer
 			</li>
 			"""
 			menuElement.append itemElement
-			@items[quadId][menuId][itemId] = menuElement
+			@items[quadId][menuId][itemId] = itemElement
 			if quadId in [1, 2]
 				# Top quads - need prepend
 				@quads[quadId].prepend menuElement

@@ -96,7 +96,7 @@ class @Maslosoft.QuadMenu.QuadMenu
 	itemClick: (e) =>
 		data = jQuery(e.target).data()
 		item = @getItem data
-		console.log item
+
 		if item
 			item.onClick e, item
 		
@@ -127,8 +127,6 @@ class @Maslosoft.QuadMenu.QuadMenu
 		return null
 	
 	getQuad: (data) ->
-		console.log @quads
-		console.log data
 		if @quads[data.quadId]
 			return @quads[data.quadId]
 		return null
@@ -161,9 +159,8 @@ class @Maslosoft.QuadMenu.QuadMenu
 		for size in [0 ... 4]
 
 			# Push into first empty quad or with lowest number of menus
-			for quad, id in @quads
-				q = quad
-				if q.length is size
-					menuId = q.add(menu)
-					@renderer.add id, menuId, menu
+			for quad in @quads
+				if quad.length is size
+					quad.add(menu)
+					@renderer.add quad, menu
 					return

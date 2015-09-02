@@ -6,6 +6,8 @@ class @Maslosoft.QuadMenu.ItemBase
 
 	id: 0
 
+	parent: null
+
 	length: 0
 
 	visible: true
@@ -19,7 +21,7 @@ class @Maslosoft.QuadMenu.ItemBase
 	constructor: (options = {}) ->
 
 		# This is to avid reference problems
-		@items = new Array
+		@reset()
 
 		# Init from options
 		for name, value of options
@@ -28,7 +30,15 @@ class @Maslosoft.QuadMenu.ItemBase
 	add: (item) ->
 		@length++;
 		@items.push item
-		return @length - 1
+		id = @length - 1
+		item.id = id
+		item.parent = @
+		return id
+
+	reset: () ->
+		@parent = null
+		@length = 0
+		@items = new Array
 
 	get: (itemId) ->
 		if @items[itemId]

@@ -4,6 +4,14 @@
 #
 class @Maslosoft.QuadMenu.Menu  extends @Maslosoft.QuadMenu.ItemBase
 
+	constructor: (options = {}) ->
+		super options
+		if options.items
+			@reset()
+			for item, id in options.items
+				item = new Maslosoft.QuadMenu.Item(item)
+				@add item
+
 	#
 	# Title of menu. If not set, it will
 	# @var string

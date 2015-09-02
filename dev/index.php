@@ -19,13 +19,22 @@ require '_header.php'
 		</label>
 	<?php endforeach; ?>
 </div>
+<div id="menusHide">
+	<?php foreach ([0, 1] as $menuId): ?>
+		<label data-menu-id="<?= $menuId; ?>"
+				 data-quad-id="0">
+			<input type="checkbox" />
+			Hide menu 0, <?= $menuId; ?>
+		</label>
+	<?php endforeach; ?>
+</div>
 <div id="itemsHide">
-	<?php foreach ([0, 1, 2] as $id): ?>
-		<label data-item-id="<?= $id; ?>"
+	<?php foreach ([0, 1, 2] as $itemId): ?>
+		<label data-item-id="<?= $itemId; ?>"
 				 data-menu-id="0"
 				 data-quad-id="0">
 			<input type="checkbox" />
-			Hide item 0, 0, <?= $id; ?>
+			Hide item 0, 0, <?= $itemId; ?>
 		</label>
 	<?php endforeach; ?>
 </div>
@@ -39,11 +48,11 @@ require '_header.php'
 		};
 		var menus = [];
 		var menu = new Maslosoft.QuadMenu.Menu({
-			title: 'First quad',
+			title: 'First menu',
 			items: [
-				new Maslosoft.QuadMenu.Item({title: 'First item', onClick: click}),
-				new Maslosoft.QuadMenu.Item({title: 'First item 2', onClick: click}),
-				new Maslosoft.QuadMenu.Item({title: 'First item 3', onClick: click})
+				{title: 'First item', onClick: click},
+				{title: 'First item 2', onClick: click},
+				{title: 'First item 3', onClick: click}
 			]
 		});
 
@@ -105,30 +114,28 @@ require '_header.php'
 
 		// Additional stuff
 		// Show/hide items
-		jQuery('#itemsHide').on('click', 'label', function (e) {
+		var click = function (e, method) {
 			e.stopPropagation();
 			var el = jQuery(e.target);
-			var box = el.find('checkbox');
+			var box = el.find('input');
 			var data = el.data();
 			if (data.itemId !== null) {
-				var item = quadMenu.getItem(data);
+				var item = quadMenu[method](data);
 				if (item) {
 					item.isVisible(box.is(':checked'));
 				}
 			}
+		};
+		jQuery('#itemsHide').on('click', 'label', function (e) {
+			click(e, 'getItem');
+		});
+		// Show hide menus
+		jQuery('#menusHide').on('click', 'label', function (e) {
+			click(e, 'getMenu');
 		});
 		// Show hide quads
 		jQuery('#quadsHide').on('click', 'label', function (e) {
-			e.stopPropagation();
-			var el = jQuery(e.target);
-			var box = el.find('checkbox');
-			var data = el.data();
-			if (data.quadId !== null) {
-				var quad = quadMenu.getQuad(data);
-				if (quad) {
-					quad.isVisible(box.is(':checked'));
-				}
-			}
+			click(e, 'getQuad');
 		});
 	});
 </script>

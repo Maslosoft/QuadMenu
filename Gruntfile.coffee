@@ -1,13 +1,13 @@
 coffees = [
-	'js/_ns.coffee'
-	'js/Options.coffee'
-	'js/ItemBase.coffee'
-	'js/Item.coffee'
-	'js/Menu.coffee'
-	'js/Quad.coffee'
-	'js/QuadMenu.coffee'
-	'js/Renderer.coffee'
-	'js/Menu.coffee'
+	'_ns'
+	'Options'
+	'ItemBase'
+	'Item'
+	'Menu'
+	'Quad'
+	'QuadMenu'
+	'Renderer'
+	'Menu'
 ]
 
 less = [
@@ -15,6 +15,9 @@ less = [
 ]
 
 module.exports = (grunt) ->
+	c = new Array
+	for name in coffees
+		c.push "js/#{name}.coffee"
 
 	# Project configuration.
 	grunt.initConfig
@@ -25,7 +28,7 @@ module.exports = (grunt) ->
 					join: true
 					expand: true
 				files: [
-					'dist/quad-menu.js': coffees
+					'dist/quad-menu.js': c
 				]
 		uglify:
 			compile:
@@ -33,7 +36,7 @@ module.exports = (grunt) ->
 					'dist/quad-menu.min.js' : ['dist/quad-menu.js']
 		watch:
 			compile:
-				files: coffees
+				files: c
 				tasks: ['coffee:compile']
 			less:
 				files: less
