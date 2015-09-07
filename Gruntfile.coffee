@@ -47,12 +47,17 @@ module.exports = (grunt) ->
 					'dist/quad-menu.css' : less
 				options:
 					sourceMap: true
+		cssmin:
+			target:
+				files:
+					'dist/quad-menu.min.css' : ['dist/quad-menu.css']
 
 	# These plugins provide necessary tasks.
 	grunt.loadNpmTasks 'grunt-contrib-coffee'
 	grunt.loadNpmTasks 'grunt-contrib-watch'
 	grunt.loadNpmTasks 'grunt-contrib-uglify'
 	grunt.loadNpmTasks 'grunt-contrib-less'
+	grunt.loadNpmTasks 'grunt-contrib-cssmin'
 
 	# Default task.
-	grunt.registerTask 'default', ['coffee', 'less', 'uglify']
+	grunt.registerTask 'default', ['coffee', 'less', 'uglify', 'cssmin']
