@@ -1,25 +1,31 @@
 {
-    "name": "maslosoft/quad-menu",
-    "description": "Quad menu",
-    "require": {
-        "maslosoft/embedi": "*"
-    },
-	 "autoload": {
-		 "psr-4":{
-			 "Maslosoft\\QuadMenu\\": "src"
-		 }
-	 },
-    "license": [
-		 "AGPL",
-		 "Commercial"
-	 ],
-    "authors": [
-        {
-            "name": "Peter Maselkowski",
-            "email": "pmaselkowski@gmail.com"
-        }
-    ],
-    "require-dev": {
-        "maslosoft/hedron": "*"
-    }
+	"name": "maslosoft/quad-menu",
+	"description": "Quad menu",
+	"require": {
+		"maslosoft/embedi": "*"
+	},
+	"keywords": [
+		"context",
+		"menu",
+		"quad"
+	],
+	"homepage": "http://maslosoft.com/quad-menu/",
+	"autoload": {
+		"psr-4": {
+			"Maslosoft\\QuadMenu\\": "src"
+		}
+	},
+	"license": [
+		"AGPL",
+		"Commercial"
+	],
+	"authors": [
+		{
+			"name": "Peter Maselkowski",
+			"email": "pmaselkowski@gmail.com"
+		}
+	],
+	"require-dev": {
+		"maslosoft/hedron": "*"
+	}
 }
