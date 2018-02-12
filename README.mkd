@@ -1,8 +1,8 @@
 <!--header-->
 <!-- Auto generated do not modify between `header` and `/header` -->
 
-# <a href="http://maslosoft.com/quad-menu/">Maslosoft Quad Menu</a>
-<a href="http://maslosoft.com/quad-menu/">_Quad menu_</a>
+# <a href="https://maslosoft.com/quad-menu/">Maslosoft Quad Menu</a>
+<a href="https://maslosoft.com/quad-menu/">_Quad menu_</a>
 
 <a href="https://packagist.org/packages/maslosoft/quad-menu" title="Latest Stable Version">
 <img src="https://poser.pugx.org/maslosoft/quad-menu/v/stable.svg" alt="Latest Stable Version" style="height: 20px;"/>
